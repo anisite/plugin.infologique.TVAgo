@@ -7,14 +7,14 @@ import urllib
 import xbmcgui
 from traceback import print_exc
 
-from toutvapiservice import *
+from tvagoapiservice import *
 
-toutvapi = TouTvApi()
+tvagoapi = tvagoApi()
 
 TOU_TV_URL = 'http://www.tou.tv'
 
 def getVideo( PID, refresh=True ):
-    return toutvapi.theplatform( PID, refresh=refresh )
+    return tvagoapi.theplatform( PID, refresh=refresh )
 
 def getVideoExtra( PID, refresh=True ):
     print "START getVideoExtra - -----"
@@ -56,33 +56,33 @@ def getDate( jsondate ):
 
 
 def getPageAccueil():
-    results = toutvapi.GetPageAccueil()
+    results = tvagoapi.GetPageAccueil()
     return results
 
 
 def searchTerms( strSearch ):
-    results = toutvapi.SearchTerms( query=strSearch  ) or {}
+    results = tvagoapi.SearchTerms( query=strSearch  ) or {}
     return results.get( "Results", [] )
 
 
 def getCarrousel( playlistName ):
-    carrousel = toutvapi.GetCarrousel( playlistName=playlistName )
+    carrousel = tvagoapi.GetCarrousel( playlistName=playlistName )
     return carrousel
 
 
 def getCollections():
-    collections = toutvapi.GetCollections()
+    collections = tvagoapi.GetCollections()
     return collections
 
 
 def getPageRepertoire( cat='Emissions', refresh=False ):
     # cat : string 'Pays', 'Genres', 'Emissions'
-    repertoire = toutvapi.GetPageRepertoire( refresh=refresh ) or {}
+    repertoire = tvagoapi.GetPageRepertoire( refresh=refresh ) or {}
     return repertoire.get( cat )
 
 
 def getEmissions():
-    emissions = toutvapi.GetEmissions() or []
+    emissions = tvagoapi.GetEmissions() or []
     return emissions
 
 
@@ -140,22 +140,22 @@ def getEmissionsWithFullDescription():
 
 
 def getGenres():
-    genres = toutvapi.GetGenres()
+    genres = tvagoapi.GetGenres()
     return genres
 
 
 def getPageGenre( genre ):
-    page = toutvapi.GetPageGenre( genre=genre )
+    page = tvagoapi.GetPageGenre( genre=genre )
     return page
 
 
 def getPageEmission( emissionId, cat='Episodes', uselocal=False, refresh=False ):
-    emission = toutvapi.GetPageEmission( emissionId=emissionId, uselocal=uselocal, refresh=refresh ) or {}
+    emission = tvagoapi.GetPageEmission( emissionId=emissionId, uselocal=uselocal, refresh=refresh ) or {}
     return emission#.get( cat )
 
 
 def getPageEpisode( episodeId ):
-    episodes = toutvapi.GetPageEpisode( episodeId=episodeId )
+    episodes = tvagoapi.GetPageEpisode( episodeId=episodeId )
     return episodes
 
 
@@ -249,17 +249,17 @@ def refreshAllEmissions( dialog_update=None ):
             print "%i%%" % pct, emission[ "Titre" ]
         getPageEmission( emission[ "Id" ], refresh=True )
 
-    print "[TouTV] Refresh all emissions took %s" % time_took( t )
+    print "[tvago] Refresh all emissions took %s" % time_took( t )
 
 
-def toutvdb( refresh=False ):
+def tvagodb( refresh=False ):
     #not used in features
     t = time.time()
-    toutv_db = os.path.join( os.path.dirname( ADDON_CACHE ), "toutv.json" )
-    if not refresh and os.path.exists( toutv_db ):
-        if not is_expired( os.path.getmtime( toutv_db ) ):
+    tvago_db = os.path.join( os.path.dirname( ADDON_CACHE ), "tvago.json" )
+    if not refresh and os.path.exists( tvago_db ):
+        if not is_expired( os.path.getmtime( tvago_db ) ):
             try:
-                data = json.loads( open( toutv_db ).read() )
+                data = json.loads( open( tvago_db ).read() )
                 print time_took( t )
                 return data
             except: pass
@@ -277,7 +277,7 @@ def toutvdb( refresh=False ):
 
     str_all = json_dumps( all, debug=False )
     #print str_all
-    try: file( toutv_db, "wb" ).write( str_all )
+    try: file( tvago_db, "wb" ).write( str_all )
     except: print_exc()
 
     data = json.loads( str_all )
@@ -287,7 +287,7 @@ def toutvdb( refresh=False ):
 
 #if ( __name__ == "__main__" ):
     #setDebug( True )
-    #print toutvdb().keys()
+    #print tvagodb().keys()
 
     #getEmissionsWithFullDescription()
     #refreshAllEmissions()

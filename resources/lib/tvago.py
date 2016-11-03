@@ -26,7 +26,7 @@ import xbmcgui
 from xbmcaddon import Addon
 import scraper
 
-MYNAME            = "plugin.infologique.tou.tv" 
+MYNAME            = "plugin.infologique.TVAgo" 
 ADDON             = Addon( MYNAME )
 ADDON_NAME        = ADDON.getAddonInfo( "name" )
 ADDON_CACHE       = xbmc.translatePath( ADDON.getAddonInfo( "profile" ) )
@@ -194,8 +194,8 @@ def goSync( new=None, refresh=False):
                 watched['watched'][url] = new[url]
                 pending[url] = new[url]
 
-            post_data = {'loginEmail': Addon( "plugin.infologique.tou.tv" ).getSetting( "username" ), "watched": pending, "lastUpdate": watched['updateTime'] }
-            response = scraper.POST_HTML("http://tv.infologique.net/TouTv/watched/", post_data)
+            post_data = {'loginEmail': Addon( "plugin.infologique.TVAgo" ).getSetting( "username" ), "watched": pending, "lastUpdate": watched['updateTime'] }
+            response = scraper.POST_HTML("http://tv.infologique.net/tvago/watched/", post_data)
             
             toUpdate = json.loads(response)
             
@@ -292,7 +292,7 @@ class Main( viewtype ):
             #    except:
             #        print_exc()
             if start_player:
-                import TouTvPlayer as player
+                import tvagoPlayer as player
                 #print "CALL player : player.playVideoExtra"
                 #print self.args.KEY
                 #print "POPUP ????????????????????????????????????????????"
@@ -334,7 +334,7 @@ class Main( viewtype ):
             #    #except:
             #    #    print_exc()
             if start_player:
-                import TouTvPlayer as player
+                import tvagoPlayer as player
                 try: player.playVideo( self.args.PID, startoffset=startoffset )
                 except: print_exc()
 
@@ -471,8 +471,8 @@ class Main( viewtype ):
     #            ( ( uri, 'countries'   ), ( LangXBMC( 20451 ),        '', 'DefaultAddonVisualization.png'    ) ),
     #            ( ( uri, 'collection'  ), ( 'Collections',            '', 'DefaultMusicAlbums.png'           ) ),
     #            ( ( uri, 'adecouvrir'  ), ( 'À Découvrir',            '', 'DefaultMusicArtists.png'          ) ),
-    #            ( ( uri, 'favoris'     ), ( 'Les Favoris Sur TouTV',  '', 'DefaultAddonScreensaver.png'      ) ),
-    #            ( ( uri, 'carrousel'   ), ( 'Carrousel TouTV',        '', 'DefaultAddonVisualization.png'    ) ),
+    #            ( ( uri, 'favoris'     ), ( 'Les Favoris Sur tvago',  '', 'DefaultAddonScreensaver.png'      ) ),
+    #            ( ( uri, 'carrousel'   ), ( 'Carrousel tvago',        '', 'DefaultAddonVisualization.png'    ) ),
     #            ( ( uri, 'outdated'    ), ( 'A à Z + Outdated',       '', 'DefaultMusicYears.png'            ) ),
     #            ( ( uri, 'plusrecents' ), ( LangXBMC( 20387 ),        '', 'DefaultRecentlyAddedEpisodes.png' ) ),
     #            ( ( uri, 'recherche'   ), ( LangXBMC( 137 ),          '', 'DefaultAddonWebSkin.png'          ) ),
@@ -514,7 +514,7 @@ class Main( viewtype ):
                 items.append((( uri, 'enecoute' ), ( u'En cours d\'écoute',       'En cours d\'écoute', 'DefaultAddonScreensaver.png'      )))
             #items.append((( uri, 'bookmark' ), ( 'Infoman - Épisode 11',       'Mes Favoris', 'DefaultAddonScreensaver.png'      )))
             items.append(('Addon.OpenSettings(plugin.infologique.tou.tv)', ( u'[COLOR blue][B]Menu[/B][/COLOR]',       'Mes Favoris', 'DefaultAddonScreensaver.png'      )))
-            #items.append(( ( uri, 'carrousel'   ), ( 'Carrousel TouTV',        '', 'DefaultAddonVisualization.png'    ) ))
+            #items.append(( ( uri, 'carrousel'   ), ( 'Carrousel tvago',        '', 'DefaultAddonVisualization.png'    ) ))
             for section in sections:
                 print section
                 items.append((( uri, section['Name'] ), ( section['Title'],       section['Title'], 'DefaultAddonScreensaver.png'      )))
@@ -526,8 +526,8 @@ class Main( viewtype ):
             #    ( ( uri, 'countries'   ), ( LangXBMC( 20451 ),        '', 'DefaultAddonVisualization.png'    ) ),
             #    ( ( uri, 'collection'  ), ( 'Collections',            '', 'DefaultMusicAlbums.png'           ) ),
             #    ( ( uri, 'adecouvrir'  ), ( 'À Découvrir',            '', 'DefaultMusicArtists.png'          ) ),
-            #    ( ( uri, 'favoris'     ), ( 'Les Favoris Sur TouTV',  '', 'DefaultAddonScreensaver.png'      ) ),
-            #    ( ( uri, 'carrousel'   ), ( 'Carrousel TouTV',        '', 'DefaultAddonVisualization.png'    ) ),
+            #    ( ( uri, 'favoris'     ), ( 'Les Favoris Sur tvago',  '', 'DefaultAddonScreensaver.png'      ) ),
+            #    ( ( uri, 'carrousel'   ), ( 'Carrousel tvago',        '', 'DefaultAddonVisualization.png'    ) ),
             #    ( ( uri, 'outdated'    ), ( 'A à Z + Outdated',       '', 'DefaultMusicYears.png'            ) ),
             #    ( ( uri, 'plusrecents' ), ( LangXBMC( 20387 ),        '', 'DefaultRecentlyAddedEpisodes.png' ) ),
             #    ( ( uri, 'recherche'   ), ( LangXBMC( 137 ),          '', 'DefaultAddonWebSkin.png'          ) ),
@@ -563,7 +563,7 @@ class Main( viewtype ):
     #    OK = False
     #    listitems = []
     #    try:
-    #        # get toutv home page
+    #        # get tvago home page
     #        accueil = scraper.getPageAccueil()
     #        # get section
     #        results = accueil[ section ]
@@ -585,7 +585,7 @@ class Main( viewtype ):
     #    OK = False
     #    listitems = []
     #    try:
-    #        countries = scraper.toutvapi.GetPays()
+    #        countries = scraper.tvagoapi.GetPays()
     #        for country in countries:
     #            if not country: continue
     #            listitem = xbmcgui.ListItem( country )
@@ -700,7 +700,7 @@ class Main( viewtype ):
         self.AppendFolder(FOLDER, listitems)
         try:
             #genres = scraper.getGenres()
-            emissions = scraper.GET_HTML('http://tv.infologique.net/TouTv/watched/uncompleted/'+str(ADDON.getSetting( "username" ))+'/')
+            emissions = scraper.GET_HTML('http://tv.infologique.net/tvago/watched/uncompleted/'+str(ADDON.getSetting( "username" ))+'/')
             emissions = json.loads(emissions)
 
             for emission in emissions.keys():
@@ -1311,7 +1311,7 @@ class Main( viewtype ):
         #print "LISTITEM"
         #print repr(listitem)
         
-        #import TouTvPlayer as player
+        #import tvagoPlayer as player
         #try: player.playVideoExtra( episode[ "Url" ], episode[ "Key" ], startoffset=0, listitem_in=listitem )
         #except: print_exc()
         
@@ -1381,7 +1381,7 @@ class Main( viewtype ):
     #            if self.args.category == "myfavourites":
     #                c_items += [ ( "Retirer de mes favoris", "RunPlugin(%s)" % uri.replace( "addto", "removefrom" ) ) ]
     #            else:
-    #                c_items += [ ( "Ajouter à mes favoris TouTv", "RunPlugin(%s)" % uri ) ]
+    #                c_items += [ ( "Ajouter à mes favoris tvago", "RunPlugin(%s)" % uri ) ]
     #
     #        #
     #        if not hidewatched:
@@ -1550,7 +1550,7 @@ class Main( viewtype ):
     #            if self.args.category == "myfavourites":
     #                c_items += [ ( "Retirer de mes favoris", "RunPlugin(%s)" % uri.replace( "addto", "removefrom" ) ) ]
     #            else:
-    #                c_items += [ ( "Ajouter à mes favoris TouTv", "RunPlugin(%s)" % uri ) ]
+    #                c_items += [ ( "Ajouter à mes favoris tvago", "RunPlugin(%s)" % uri ) ]
     #        #
     #        if not watched:
     #            i_label, action = 16103, "setwatched"
@@ -1577,11 +1577,11 @@ class Main( viewtype ):
         #always add visit site
         #uri = '%s?webbrowser=\"%s\"' % ( sys.argv[ 0 ], quote_plus( scraper.TOU_TV_URL ) )
         
-        #c_items += [ ( "Visit TouTV", "RunPlugin(%s)" % uri ) ]
+        #c_items += [ ( "Visit tvago", "RunPlugin(%s)" % uri ) ]
         #c_items += [ ( "Refresh Emissions", "RunScript(%s)" % SCRIPT_REFRESH ) ]
 
         c_items += [ ( "Aller à l'écran principale", "Container.Update(%s,replace)" % ( sys.argv[ 0 ], ) ) ]
-        c_items += [ ("Paramètres de TOU.TV", "Addon.OpenSettings(plugin.infologique.tou.tv)" ) ]
+        c_items += [ ("Paramètres de TOU.TV", "Addon.OpenSettings(plugin.infologique.TVAgo)" ) ]
 
         listitem.addContextMenuItems( c_items, replaceItems )
 

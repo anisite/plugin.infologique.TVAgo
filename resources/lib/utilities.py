@@ -13,7 +13,7 @@ try:
     from xbmcaddon import Addon
     from xbmc import translatePath
     BASE_CACHE_PATH   = translatePath( "special://profile/Thumbnails/Video" )
-    ADDON             = Addon( "plugin.infologique.tou.tv" )
+    ADDON             = Addon( "plugin.infologique.TVAgo" )
     #ADDON_CACHE       = os.path.join( translatePath( ADDON.getAddonInfo( 'profile' ) ), ".cache" )
     #CACHE_EXPIRE_TIME = float( ADDON.getSetting( "expiretime" ).replace( "0", ".5" ).replace( "25", "0" ) )
 except:

@@ -10,7 +10,7 @@ from scraper import getVideoExtra
 from traceback import print_exc
 from xbmcaddon import Addon
 
-ADDON             = Addon( "plugin.infologique.tou.tv" )
+ADDON             = Addon( "plugin.infologique.TVAgo" )
 
 # set our infolabels
 infoLabels = {
@@ -38,7 +38,7 @@ g_thumbnail = unicode( xbmc.getInfoImage( "ListItem.Thumb" ), "utf-8" )
 #def setWatched( currentTime=0, totalTime=0 ):
 #    global listitem
 #    try:
-#        sys.modules[ 'resources.lib.toutv' ].setWatched( key, currentTime, totalTime,refresh=False )
+#        sys.modules[ 'resources.lib.tvago' ].setWatched( key, currentTime, totalTime,refresh=False )
 #        #listitem.setInfo( "video", { "playcount": 1 } )
 #    except: print_exc()
 
@@ -73,7 +73,7 @@ def playVideo( PID, startoffset=None, strwatched=None, listitem=None ):
     #    listitem.setProperty( "startoffset", str( startoffset ) ) #in second
 
     # play media
-    #player = TouTvPlayer( xbmc.PLAYER_CORE_DVDPLAYER )
+    #player = tvagoPlayer( xbmc.PLAYER_CORE_DVDPLAYER )
     #player._play( rtmp_url, listitem )
     #setWatched( listitem )
     player = None
@@ -192,11 +192,11 @@ def SetWatchedExterne(time=-1, Refresh=False):
                     "key": str(key),
                     "currentTime" : time,
                     "totalTime" : totalTime,
-                    "timestamp" : sys.modules[ 'resources.lib.toutv' ].getGMTunixtimestamp(),
+                    "timestamp" : sys.modules[ 'resources.lib.tvago' ].getGMTunixtimestamp(),
                     "data" : dataEmission
                     }
     
-        sys.modules[ 'resources.lib.toutv' ].goSync( new, Refresh )
+        sys.modules[ 'resources.lib.tvago' ].goSync( new, Refresh )
     except: print_exc()
     
 class XBMCPlayer(xbmc.Player):

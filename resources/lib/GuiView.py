@@ -7,13 +7,13 @@ from traceback import print_exc
 import xbmc
 import xbmcgui
 from xbmcaddon import Addon
-ADDON = Addon( "plugin.infologique.tou.tv" )
+ADDON = Addon( "plugin.infologique.TVAgo" )
 
 BAD_THUMBS_FILE = os.path.join( xbmc.translatePath( ADDON.getAddonInfo( "profile" ) ), ".cache", "badthumbs.txt" )
 BASE_CACHE_PATH = xbmc.translatePath( "special://profile/Thumbnails/Video" )
 
-import toutvapiservice
-urllib._urlopener = toutvapiservice.urllib._urlopener
+import tvagoapiservice
+urllib._urlopener = tvagoapiservice.urllib._urlopener
 
 try: STRBADTHUMBS = file( BAD_THUMBS_FILE, "r" ).read()
 except: STRBADTHUMBS = ""
@@ -111,8 +111,8 @@ class Carrousel( xbmcgui.WindowXML ):
         self.listitems = kwargs[ "listitems" ]
         self.container = None
 
-        import TouTvPlayer
-        self.player = TouTvPlayer
+        import tvagoPlayer
+        self.player = tvagoPlayer
 
     def onInit( self ):
         try:

@@ -1,3 +1,3 @@
-﻿from resources.lib.toutv import Main
+﻿from resources.lib.tvago import Main
 
 Main()

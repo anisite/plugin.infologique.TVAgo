@@ -16,7 +16,7 @@ from utilities import *
 
 DEBUG = False
 
-API_SERVICE_URL         = "http://api.tou.tv/v1/toutvapiservice.svc/json/"
+API_SERVICE_URL         = "http://api.tou.tv/v1/tvagoapiservice.svc/json/"
 THEPLATFORM_CONTENT_URL = "http://release.theplatform.com/content.select?pid=%s&format=SMIL" #+"&mbr=true"
 #VALIDATION_MEDIA_URL        = "http://api.radio-canada.ca/validationMedia/v1/Validation.html?appCode=thePlatform&connectionType=broadband&output=json&"
 VALIDATION_MEDIA_URL         = "http://api.radio-canada.ca/validationMedia/v1/Validation.html?connectionType=broadband&appCode=toutv&output=json&multibitrate=true&deviceType=samsung&timeout=1058&idMedia=%s"
@@ -267,7 +267,7 @@ class _urlopener( urllib.FancyURLopener ):
 urllib._urlopener = _urlopener()
 
 
-class TouTvApi:
+class tvagoApi:
     def __init__( self ):
         self.__handler_cache = {}
 
@@ -306,7 +306,7 @@ class TouTvApi:
         content = get_html_source( url, refresh, uselocal )
         data = json.loads( content ).get( "d" )
         #
-        _print( "[TouTvApi] %s took %s" % ( method, time_took( start_time ) ) )
+        _print( "[tvagoApi] %s took %s" % ( method, time_took( start_time ) ) )
         json_dumps( data )
         return data
         
@@ -315,7 +315,7 @@ class TouTvApi:
         content = get_html_source( VALIDATION_MEDIA_URL % PID, refresh )
         val = json.loads(content)
 
-        _print( "[TouTvApi] thePlatform took %s" % time_took( start_time ) )
+        _print( "[tvagoApi] thePlatform took %s" % time_took( start_time ) )
 
         return val
 
@@ -330,16 +330,16 @@ class TouTvApi:
         #content = get_html_source( VALIDATION_MEDIA_URL + urllib.urlencode( kwargs ), refresh )
         #data = json.loads( content )
         ##
-        #_print( "[TouTvApi] Validation took %s" % time_took( start_time ) )
+        #_print( "[tvagoApi] Validation took %s" % time_took( start_time ) )
         #json_dumps( data )
         #return data
 
 
 if ( __name__ == "__main__" ):
     setDebug( True )
-    toutvapi = TouTvApi()
+    tvagoapi = tvagoApi()
     
-    toutvapi.GetPays()
+    tvagoapi.GetPays()
 
     #toutvapi.GetPageRepertoire()
     #toutvapi.GetPageAccueil()
