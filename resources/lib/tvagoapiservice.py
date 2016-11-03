@@ -3,7 +3,7 @@ import re
 import urllib
 import cookielib
 import urllib2
-from BeautifulSoup import BeautifulSoup
+#from BeautifulSoup import BeautifulSoup
 from StringIO import StringIO
 import gzip
 
@@ -16,6 +16,8 @@ from utilities import *
 
 DEBUG = False
 
+
+MEMBRE_GET_DATA = "https://membre.quebecormedia.com/auth/api/v2/user/tvago/"
 API_SERVICE_URL         = "http://api.tou.tv/v1/tvagoapiservice.svc/json/"
 THEPLATFORM_CONTENT_URL = "http://release.theplatform.com/content.select?pid=%s&format=SMIL" #+"&mbr=true"
 #VALIDATION_MEDIA_URL        = "http://api.radio-canada.ca/validationMedia/v1/Validation.html?appCode=thePlatform&connectionType=broadband&output=json&"
@@ -71,20 +73,20 @@ def POST_HTML_TOKEN(url, POST):
     opener.addheaders = [
     ('Connection', 'keep-alive'),
     ('Cache-Control','max-age=0'),
-    ('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'),
-    ('Origin', 'https://services.radio-canada.ca'),
-    ('User-Agent', 'Mozilla/5.0 (Linux; Android 5.0.2; GT-N7105 Build/LRX22G) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/37.0.0.0 Mobile Safari/537.36'),
-    ('Content-Type', 'application/x-www-form-urlencoded'),
-    ('Referer', 'https://services.radio-canada.ca/auth/oauth/v2/authorize'),
+    ('Accept', 'text/html, */*; q=0.01'),
+    ('Origin', 'https://membre.quebecormedia.com'),
+    ('User-Agent', 'Mozilla/5.0 (Linux; Android 7.1.1; Nexus 6P Build/NPF10C; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/54.0.2840.68 Mobile Safari/537.36'),
+    ('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8'),
+    ('Referer', 'https://membre.quebecormedia.com/auth/webView/signIn/tvago?locale=fr_CA&returnUrl=file:///_success.html'),
     ('Accept-Encoding','gzip,deflate'),
-    ('Accept-Language','fr-CA,en-US;q=0.8'),
-    ('Cookie', 'l7otk2a=; s_cc=true; s_fid=129B0FEF1E58DAB0-00C1D057FFBBE1B5; s_sq=rc-toutv-all%3D%2526pid%253Dcentredesmembres%25253Aconnexion%25253Aformulaire%25253Adebut%25253Apage%2526pidt%253D1%2526oid%253DOuvrir%252520une%252520session%2526oidt%253D3%2526ot%253DSUBMIT'),
-    ('X-Requested-With', 'tv.tou.android')
+    ('Accept-Language','fr-FR,en-US;q=0.8'),
+    ('Cookie', 'JSESSIONID=70A8BF115451B541BAE844E07DB454A9; sto-id-47873=FHEGBEAKFAAA; login_tab=googleplus; expected_tab=googleplus; welcome_info_name=Dany%20C%F4t%E9; user-event="ewogICJldmVudENhdGVnb3J5IjogImxvZ2luIiwKICAiZXZlbnRBY3Rpb24iOiAic3VjY2VzcyIsCiAgImV2ZW50TGFiZWwiOiAiR29vZ2xlKyIKfQ=="; sofi_locale=fr_CA')
     ]
     
     try:
         response = opener.open(url,post_data)
-        access_token = response.geturl().split('#access_token=')[1][:36]
+        access_token = response.read().split('token://')[1]
+        print access_token
     except:
         print "oups 401..."
         access_token = None
@@ -106,7 +108,20 @@ def GET_HTML( url):
     return ""
 
 def _GetUserInfo():
-    infos = GET_HTML_AUTH("https://services.radio-canada.ca/openid/connect/v1/userinfo", True)
+
+    print "_GetUserInfo"
+    request = urllib2.Request(MEMBRE_GET_DATA + GET_ACCESS_TOKEN())
+    request.add_header('Accept-encoding', 'gzip')
+    response = urllib2.urlopen(request)
+    if response.info().get('Content-Encoding') == 'gzip':
+        buf = StringIO( response.read() )
+        f = gzip.GzipFile(fileobj=buf)
+        infos = f.read()
+        #return data
+    else:
+        infos = response.read()
+    #return ""
+
     #print "_GetUserInfo : " + infos
     connected = True
     name = None
@@ -115,7 +130,7 @@ def _GetUserInfo():
         name = "Bonjour, impossible de se connecter, verifiez votre mot de passe"
     else:
         #print infos
-        name = json.loads(infos)["name"]
+        name = json.loads(infos)["firstName"]
         name = "Bonjour " + name
     return (connected, name)
   
@@ -195,11 +210,12 @@ def GET_CLAIM( ):
 #def GET_VIDEO( id ):
 #    GET_HTML('https://services.radio-canada.ca/media/validation/v2/?appCode=toutv&deviceType=iphone4&connectionType=wifi&idMedia=112259&claims=FF991AC02DA2277DD55C46CECC7BD2D8A51A9B3845611C3F229F6C5D4AF2B755A7C245A4EB9AD090F56CB9A765EAD68AAC638751CE90500AC51F09445E9002998A03D54994DA02F52CFA36AD94F16BE69516063885BF0ECCBA6BCD70383725D2901C5A3B8958DC6A6B7D5D9442860C2DAB86E4346329CFE64CE5B386B310D3DC&output=json')
 
-def GET_SESSIONID( ):
+def GET_SESSIONID():
     #html_proc = BeautifulSoup(self.GET_HTML('http://ici.tou.tv/Login?response_type=token'))
-    html_proc = BeautifulSoup(GET_HTML('https://services.radio-canada.ca/auth/oauth/v2/authorize?response_type=token&client_id=d6f8e3b1-1f48-45d7-9e28-a25c4c514c60&scope=oob+openid+profile+email+id.write+media-validation.read.privileged&state=authCode&redirect_uri=http://ici.tou.tv/profiling/callback'))
+    #html_proc = BeautifulSoup(GET_HTML('https://services.radio-canada.ca/auth/oauth/v2/authorize?response_type=token&client_id=d6f8e3b1-1f48-45d7-9e28-a25c4c514c60&scope=oob+openid+profile+email+id.write+media-validation.read.privileged&state=authCode&redirect_uri=http://ici.tou.tv/profiling/callback'))
+    html_proc = GET_HTML('https://services.radio-canada.ca/auth/oauth/v2/authorize?response_type=token&client_id=d6f8e3b1-1f48-45d7-9e28-a25c4c514c60&scope=oob+openid+profile+email+id.write+media-validation.read.privileged&state=authCode&redirect_uri=http://ici.tou.tv/profiling/callback')
     listform = ["sessionID"]
-    otrimput = html_proc.findAll('input', {'name': listform})
+    #otrimput = html_proc.findAll('input', {'name': listform})
     for elem in otrimput:
         value = elem.get('value')
         if value:
@@ -211,13 +227,12 @@ def GET_SESSIONID( ):
 
 def TEST( ):
     print "Start TEST user"
-    POST = {'sessionID' : GET_SESSIONID(),
-            'requested-operation' : 'login',
-            'login-email': ADDON.getSetting( "username" ),
-            'login-password': ADDON.getSetting( "password" ),
-            'action': 'Ouvrir une session'
+    POST = {'isWebView' :'true',
+            'publication' : 'tvago',
+            'email': ADDON.getSetting( "username" ),
+            'password': ADDON.getSetting( "password" )
             }
-    access_token = POST_HTML_TOKEN('https://services.radio-canada.ca/auth/oauth/v2/authorize',POST)
+    access_token = POST_HTML_TOKEN('https://membre.quebecormedia.com/auth/signIn?locale=fr_CA ',POST)
     ADDON.setSetting( "access_token_" + ADDON.getSetting( "username") , access_token)
     return access_token
     
