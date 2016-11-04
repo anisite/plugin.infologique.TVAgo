@@ -18,7 +18,8 @@ DEBUG = False
 
 
 MEMBRE_GET_DATA = "https://membre.quebecormedia.com/auth/api/v2/user/tvago/"
-API_SERVICE_URL         = "http://api.tou.tv/v1/tvagoapiservice.svc/json/"
+VIDEO_API        = "https://videos.tva.ca/isl/api/v1/dataservice/"
+API_SERVICE_URL         = "_VIDE_"
 THEPLATFORM_CONTENT_URL = "http://release.theplatform.com/content.select?pid=%s&format=SMIL" #+"&mbr=true"
 #VALIDATION_MEDIA_URL        = "http://api.radio-canada.ca/validationMedia/v1/Validation.html?appCode=thePlatform&connectionType=broadband&output=json&"
 VALIDATION_MEDIA_URL         = "http://api.radio-canada.ca/validationMedia/v1/Validation.html?connectionType=broadband&appCode=toutv&output=json&multibitrate=true&deviceType=samsung&timeout=1058&idMedia=%s"
@@ -157,6 +158,9 @@ def CheckLogged():
     return premiumData;
 
 def GET_ACCESS_TOKEN():
+    return ADDON.getSetting( "access_token_" + ADDON.getSetting( "username" ))
+    
+def GET_MASSIVE_TOKENS():
     return ADDON.getSetting( "access_token_" + ADDON.getSetting( "username" ))
     
 def GET_HTML_AUTH( url, PreventLoop=False ):
