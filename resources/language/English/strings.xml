@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <!-- GENERALITE -->
+    <string id="32000">Configuration</string>
+    <string id="32110">Advances settings</string>
+    <string id="32100">Apparence</string>
+    <string id="32101">Enable the addon fanart</string>
+    <string id="32102">If available, use the tv-show image as fanart</string>
+    <string id="32114">Show tv-show name in the description section</string>
+    <string id="32115">Verify network and web site connectivity</string>
+
+    <!-- CACHE -->
+    <string id="32105">Cache</string>
+    <string id="32106">Time to live of cached content</string>
+    <string id="32107">Clear cache now!</string>
+    <string id="32108">Deleting cache...</string>
+    <string id="32109">Done!</string>
+    <string id="32200">30 Minutes</string>
+    <string id="32201">1 Hour</string> <string id="32202">2 Hours</string> <string id="32203">3 Hours</string> <string id="32204">4 Hours</string>
+    <string id="32205">5 Hours</string> <string id="32206">6 Hours</string> <string id="32207">7 Hours</string> <string id="32208">8 Hours</string>
+    <string id="32209">9 Hours</string> <string id="32210">10 Hours</string> <string id="32211">11 Hours</string> <string id="32212">12 Hours</string>
+    <string id="32213">13 Hours</string> <string id="32214">14 Hours</string> <string id="32215">15 Hours</string> <string id="32216">16 Hours</string>
+    <string id="32217">17 Hours</string> <string id="32218">18 Hours</string> <string id="32219">19 Hours</string> <string id="32220">20 Hours</string>
+    <string id="32221">21 Hours</string> <string id="32222">22 Hours</string> <string id="32223">23 Hours</string> <string id="32224">24 Hours</string>
+    <string id="32225">25 Hours</string> <string id="32226">26 Hours</string> <string id="32227">27 Hours</string> <string id="32228">28 Hours</string>
+    <string id="32229">29 Hours</string> <string id="32230">30 Hours</string> <string id="32231">31 Hours</string> <string id="32232">32 Hours</string>
+    <string id="32233">33 Hours</string> <string id="32234">34 Hours</string> <string id="32235">35 Hours</string> <string id="32236">36 Hours</string>
+    <string id="32237">37 Hours</string> <string id="32238">38 Hours</string> <string id="32239">39 Hours</string> <string id="32240">40 Hours</string>
+    <string id="32241">41 Hours</string> <string id="32242">42 Hours</string> <string id="32243">43 Hours</string> <string id="32244">44 Hours</string>
+    <string id="32245">45 Hours</string> <string id="32246">46 Hours</string> <string id="32247">47 Hours</string> <string id="32248">48 Hours</string>
+    <string id="32249">49 Hours</string> <string id="32250">50 Hours</string> <string id="32251">51 Hours</string> <string id="32252">52 Hours</string>
+    <string id="32253">53 Hours</string> <string id="32254">54 Hours</string> <string id="32255">55 Hours</string> <string id="32256">56 Hours</string>
+    <string id="32257">57 Hours</string> <string id="32258">58 Hours</string> <string id="32259">59 Hours</string> <string id="32260">60 Hours</string>
+    <string id="32261">61 Hours</string> <string id="32262">62 Hours</string> <string id="32263">63 Hours</string> <string id="32264">64 Hours</string>
+    <string id="32265">65 Hours</string> <string id="32266">66 Hours</string> <string id="32267">67 Hours</string> <string id="32268">68 Hours</string>
+    <string id="32269">69 Hours</string> <string id="32270">70 Hours</string> <string id="32271">71 Hours</string> <string id="32272">72 Hours</string>
+    <string id="32273">None</string>
+    <string id="32122">Auto-delete Kodi .fi temporary files</string>
+
+    <!-- SORTING -->
+    <string id="32111">Sorting method</string>
+    <string id="32300">As the web site</string>
+    <string id="32301">Order by title</string>
+
+    <!-- OTHERS -->
+    <string id="32103">Miscellaneous</string>
+    <string id="32104">Debug mode - Consult the kodi log file</string>
+    <string id="32112">OUTCH! ERROR!</string>
+    <string id="32113">The Tele-Quebec web site zonevideo.telequebec.tv or network is unavailable?!</string>
+    <string id="32120">EMPTY DIRECTORY</string>
+    <string id="32121">The selected directory do not contains any video</string>
+
+</strings>

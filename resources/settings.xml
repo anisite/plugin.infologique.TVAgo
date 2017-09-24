@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
+    <!-- APPARENCE -->
+    <category label="32100">
+        <setting label="32101" type="bool" id="FanartEnabled" default="true"/>
+        <setting label="32102" type="bool" id="FanartEmissionsEnabled" default="true" enable="eq(-1,true)"/>
+        <setting label="32114" type="bool" id="EmissionNameInPlotEnabled" default="true"/>
+    </category> 
 
-  <!-- General -->
-  <category label="$LOCALIZE[128]">
-    <setting type="lsep" label="Authentification" />
-    <setting id="username" type="text" label="Adresse courriel du compte" default="" />
-    <setting id="password" type="text" label="Mot de passe" option="hidden" default="" />
-    <!--<setting type="lsep" label="Préférences" />-->
-     <!-- <setting id="expiretime" type="enum" label="$LOCALIZE[397]" values="30 Minutes|1 Hour|2 Hours|3 Hours|4 Hours|5 Hours|6 Hours|7 Hours|8 Hours|9 Hours|10 Hours|11 Hours|12 Hours|13 Hours|14 Hours|15 Hours|16 Hours|17 Hours|18 Hours|19 Hours|20 Hours|21 Hours|22 Hours|23 Hours|24 Hours|None" default="24" />-->
-    <!--<setting id="quality"  type="enum" label="Qualité" values="SD|HD" default="1" />-->
-    <!--<setting id="typeflux"  type="select" label="Type de flux" values="HLS|RTSP" default="HLS" />-->
-    <!--<setting type="sep" />-->
-    <!--<setting type="action" label="Clean Cache..." action="RunScript($CWD/resources/lib/clearcache.py,full)" default="" />-->
-  </category>
+    <!-- ADVANCE -->
+    <category label="32110">
+        <setting label="32122" type="bool" id="DeleteTempFiFilesEnabled" default="false"/>
+        <setting label="32106" type="enum" id="CacheTTL" lvalues="32200|32201|32202|32203|32204|32205|32206|32207|32208|32209|32210|32211|32212|32213|32214|32215|32216|32217|32218|32219|32220|32221|32222|32223|32224|32225|32226|32227|32228|32229|32230|32231|32232|32233|32234|32235|32236|32237|32238|32239|32240|32241|32242|32243|32244|32245|32246|32247|32248|32249|32250|32251|32252|32253|32254|32255|32256|32257|32258|32259|32260|32261|32262|32263|32264|32265|32266|32267|32268|32269|32270|32271|32272|32273" default="24" />
+        <setting label="32107" type="action" action="RunScript($CWD/resources/lib/clearcache.py,full)" default="" />
+        <setting type="lsep" /> -->
+        <setting label="32115" type="bool" id="NetworkDetection" default="true"/>
+        <setting label="32104" type="bool" id="DebugMode" default="false"/>
+    </category> 
+
 </settings>
