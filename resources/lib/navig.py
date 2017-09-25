@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-# version 3.1.0 - By CB, PLafrance & andreq
-# version 3.0.0 - By CB
-# version 2.0.2 - By SlySen
-# version 0.2.6 - By CB
-#
-# pylint...: --max-line-length 120
-# vim......: set expandtab
-# vim......: set tabstop=4
-#
 
 import sys,urllib, xbmcgui, xbmcplugin, xbmcaddon,re,cache, simplejson, xbmc
 from BeautifulSoup import BeautifulSoup
@@ -15,7 +6,7 @@ from BeautifulSoup import BeautifulSoup
 ADDON = xbmcaddon.Addon()
 ADDON_IMAGES_BASEPATH = ADDON.getAddonInfo('path')+'/resources/media/images/'
 ADDON_FANART = ADDON.getAddonInfo('path')+'/fanart.jpg'
-THEPLATFORM_CONTENT_URL = "http://c.brightcove.com/services/mobile/streaming/index/master.m3u8?pubId=618566855001&videoId="
+THEPLATFORM_CONTENT_URL = "https://edge.api.brightcove.com/playback/v1/accounts/5481942443001/videos/"
 
 __handle__ = int(sys.argv[1])
 
@@ -34,7 +25,7 @@ def ajouterItemAuMenu(items):
         if items[0]['forceSort']  :
             xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
             xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_DATE)
-
+            
 
 
 

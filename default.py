@@ -17,16 +17,16 @@ def creer_menu_categories():
     """ function docstring """
     navig.ajouterItemAuMenu(content.dictOfMainDirs(filtres))
     navig.ajouterItemAuMenu(content.dictOfGenres(filtres))
-    xbmc.executebuiltin('Container.SetViewMode(500)') # "Info-wall" view. 
+    xbmc.executebuiltin('Container.SetViewMode(55)') # "Info-wall" view. 
 
 def creer_liste_filtree():
     """ function docstring """
     log("---creer_liste_filtree--START----")
     log(filtres['content']['url'])
-    if "saisons" in filtres['content']['url'] :
-        navig.ajouterItemAuMenu(content.loadEmission(filtres))
-    else:
-        navig.ajouterItemAuMenu(content.loadListeSaison(filtres))
+    #if "saisons" in filtres['content']['url'] :
+    navig.ajouterItemAuMenu(content.loadEmission(filtres))
+    #else:
+    #    navig.ajouterItemAuMenu(content.loadListeSaison(filtres))
     xbmc.executebuiltin('Container.SetViewMode(55)') # "Info-wall" view. 
 
 
