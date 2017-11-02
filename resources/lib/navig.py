@@ -169,43 +169,26 @@ def jouer_video(source_url):
 
     log("--media_uid--")
     log(source_url)
-
-    #data = cache.get_cached_content(source_url)
-
-    # Obtenir JSON avec liens RTMP du playlistService
-    video_json = simplejson.loads(\
-       get_pl(\
-           'https://edge.api.brightcove.com/playback/v1/accounts/5481942443001/videos/%s' % media_uid\
-       )\
-    )
-
-    #play_list_item =video_json['playlistItems'][0]
-    #
-    ## Obtient les streams dans un playlist m3u8
-    #m3u8_pl=cache.get_cached_content('https://mnmedias.api.telequebec.tv/m3u8/%s.m3u8' % play_list_item['refId'])
-    #
-    ## Cherche le stream de meilleure qualité
-    #uri = obtenirMeilleurStream(m3u8_pl)
-
-    #soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-    #video = soup.find("video", { "id" : "videoPlayer" })
-
-    # log("video")
-    # log(video)
-
-    #uri = THEPLATFORM_CONTENT_URL + video['data-video-id']
-
-    # Plusieurs sources disponibles. Il faudrait prendre le meilleur.
-    uri = video_json['sources'][0]['src']
-
+    
+    data = simplejson.loads(cache.get_cached_content(THEPLATFORM_CONTENT_URL + source_url))
+    
+    log("--DATA PLATFORM--")
+    log(data)
+    
+    url = ""
+    
+    #Chercher la meilleure source (EXT_X_VERSION 5)
+    for x in data['sources']:
+        #log(x)
+        #log(x['ext_x_version'])
+        if x['ext_x_version'] == "5":
+            url = x['src']
+            break
+  
     # lance le stream
     if uri:
-        item = xbmcgui.ListItem(\
-            "Titre",\
-            iconImage=None,\
-            thumbnailImage=None, path=uri)
         play_item = xbmcgui.ListItem(path=uri)
-        xbmcplugin.setResolvedUrl(__handle__,True, item)
+        xbmcplugin.setResolvedUrl(__handle__,True, play_item)
     else:
         xbmc.executebuiltin('Notification(%s,Incapable d''obtenir lien du video,5000,%s')
 
