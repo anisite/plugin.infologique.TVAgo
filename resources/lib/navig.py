@@ -133,7 +133,19 @@ def jouer_video(source_url):
     log("--media_uid--")
     log(source_url)
     
-    data = cache.get_cached_content(source_url)
+    data = simplejson.loads(cache.get_cached_content(THEPLATFORM_CONTENT_URL + source_url))
+    
+    log("--DATA PLATFORM--")
+    log(data)
+    
+    url = ""
+    
+    for x in data['sources']:
+        #log(x)
+        #log(x['ext_x_version'])
+        if x['ext_x_version'] == "5":
+            url = x['src']
+            break
     
     ## Obtenir JSON avec liens RTMP du playlistService
     #video_json = simplejson.loads(\
@@ -150,22 +162,22 @@ def jouer_video(source_url):
     ## Cherche le stream de meilleure qualité
     #uri = obtenirMeilleurStream(m3u8_pl)   
 
-    soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-    video = soup.find("video", { "id" : "videoPlayer" })
+    #soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
+    #video = soup.find("video", { "id" : "videoPlayer" })
     
-    log("video")
-    log(video)
+    #log("video")
+    #log(video)
     
-    uri = THEPLATFORM_CONTENT_URL + video['data-video-id']
+    uri = url
     
     # lance le stream
     if uri:
-        item = xbmcgui.ListItem(\
-            "Titre",\
-            iconImage=None,\
-            thumbnailImage=None, path=uri)
+        #item = xbmcgui.ListItem(\
+        #    "Titre",\
+        #    iconImage=None,\
+        #    thumbnailImage=None, path=uri)
         play_item = xbmcgui.ListItem(path=uri)
-        xbmcplugin.setResolvedUrl(__handle__,True, item)
+        xbmcplugin.setResolvedUrl(__handle__,True, play_item)
     else:
         xbmc.executebuiltin('Notification(%s,Incapable d''obtenir lien du video,5000,%s')
 

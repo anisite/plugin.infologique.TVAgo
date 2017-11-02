@@ -72,7 +72,7 @@ def get_url_txt(the_url):
                    'User-Agent', \
                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'\
                    )
-    req.add_header('Accept', 'application/json')
+    req.add_header('Accept', 'application/json;pk='+ xbmcaddon.Addon().getSetting('policyKey') )
     req.add_header('Accept-Language', 'fr-CA,fr-FR;q=0.8,en-US;q=0.6,fr;q=0.4,en;q=0.2')
     req.add_header('Accept-Encoding', 'gzip, deflate')
     req.add_header('Connection', 'keep-alive')

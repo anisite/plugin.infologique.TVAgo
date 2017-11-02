@@ -282,8 +282,8 @@ def loadEmission(filtres):
 
     sections = data['item']
     
-    print "-----------------------------------------------"
-    print sections
+    #print "-----------------------------------------------"
+    #print sections
 
     
     
@@ -318,12 +318,14 @@ def AjouterSectionAListe(section,infoDict,filtres):
         duration = -1
         duration = int(infoDict['video-duration']) / 1000
         
+        url = infoDict['assetId']
+        
         newItem = {   'genreId': 1, 
                       'nom': u(infoDict['title']),
                       'resume': "",
                       'image' : infoDict['image-background'],
-                      'url' : "hhh",
-                      'sourceUrl' : "hhh",
+                      'url' : url,
+                      'sourceUrl' : url,
                       'duree' : duration,
                       'filtres' : parse.getCopy(filtres)
                   }
@@ -333,7 +335,7 @@ def AjouterSectionAListe(section,infoDict,filtres):
         elif 'shortDescription' in infoDict:
             newItem['resume'] = u(infoDict['shortDescription'])
             
-        newItem['filtres']['content']['url'] = "url"
+        newItem['filtres']['content']['url'] = url
         
         liste.append(newItem)
 
@@ -442,6 +444,7 @@ def dictOfGenres(filtres):
     log(startPage)    
     
     policyKey = config['policyKey']
+    xbmcaddon.Addon().setSetting('policyKey',policyKey)
     log(policyKey)
     
     accueil = json.loads(cache.get_cached_content(BASE_URL + "/page/"+ startPage +"?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"), encoding='utf-8')
@@ -481,7 +484,11 @@ def dictOfGenres(filtres):
                       
             newItem['filtres']['content']['url'] = carte['pageId']
             
-            liste.append(newItem)
+            if u(carte['title']) == "Rattrapage" or u(carte['title']) == "Thématiques" :
+                liste.append(newItem)
+            else :
+                newItem['nom'] = newItem['nom'] + " - NON FONCTIONNEL"
+                liste.append(newItem)
     
     #for carte in containers :
     #
