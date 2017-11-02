@@ -51,3 +51,4 @@ Temporary Items
 .pyo
 .cache/
 resources_OLD/
+*.pyo
