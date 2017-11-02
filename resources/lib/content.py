@@ -324,8 +324,10 @@ def AjouterSectionAListe(section,infoDict,filtres):
                       'nom': u(infoDict['title']),
                       'resume': "",
                       'image' : infoDict['image-background'],
+
                       'url' : url,
                       'sourceUrl' : url,
+
                       'duree' : duration,
                       'filtres' : parse.getCopy(filtres)
                   }
