@@ -48,7 +48,7 @@ Temporary Items
 
 
 #dump
-.pyo
+*.pyc
 .cache/
 resources_OLD/
 *.pyo
