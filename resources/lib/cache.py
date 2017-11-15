@@ -22,7 +22,7 @@ def is_cached_content_expired(last_update):
     return expired
 
 
-def get_cached_content(path):
+def get_cached_content(path, enablePK=True):
     """ function docstring """
     log("--get_cached_content----START--")
     content = None
@@ -31,13 +31,14 @@ def get_cached_content(path):
         if os.path.exists(filename) and not is_cached_content_expired(os.path.getmtime(filename)):
             content = open(filename).read()
         else:
-            content = html.get_url_txt(path)
+            content = html.get_url_txt(path,enablePK)
             try:
                 file(filename, "w").write(content) # cache the requested web content
             except StandardError:
                 traceback.print_exc()
     except StandardError:
         return None
+    log(content)
     return content
 
 def get_cached_filename(path):

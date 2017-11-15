@@ -66,7 +66,7 @@ def getDescription(url):
 
         log("---url---")
         log(url)
-        data = cache.get_cached_content(correctEmissionPageURL(url))
+        data = cache.get_cached_content(correctEmissionPageURL(url),True)
         
         log("---data----")
         #log(data)
@@ -425,8 +425,10 @@ def dictOfGenres(filtres):
     log("dictOfGenres")
     
     liste = []
-    
-    config = json.loads(cache.get_cached_content(BASE_URL + "/configurations?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"), encoding='utf-8')
+    log("contenu")
+    contenu = cache.get_cached_content(BASE_URL + "/configurations?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en", False)
+    log(contenu)
+    config = json.loads(contenu, encoding='utf-8')
     
     #elems = ET.fromstring(data)
     
