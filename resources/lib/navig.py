@@ -31,8 +31,6 @@ def AddFolder(show):
     strFanart = show['fanart']
     filtres = show['filtres']
 
-    log(strTitle)
-
     if strPlot=='':
         strPlot = urllib.unquote(ADDON.getAddonInfo('id') + ' v.' + ADDON.getAddonInfo('version'))
     if ADDON.getSetting('EmissionNameInPlotEnabled') == 'true':

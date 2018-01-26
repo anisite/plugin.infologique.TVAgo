@@ -65,7 +65,7 @@ def html_unescape(data):
 
 def get_url_txt(the_url, enablePK=False):
     """ function docstring """
-    # log("--get_url_txt----START--")
+    log("html.get_url_txt")
 
     req = urllib2.Request(the_url)
     req.add_header(\
@@ -84,8 +84,6 @@ def get_url_txt(the_url, enablePK=False):
     response = urllib2.urlopen(req)
 
     data = ""
-    # log("--encoding--")
-    # log(response.info().get('Content-Encoding'))
 
     if response.info().get('Content-Encoding') == 'gzip':
         buf = StringIO( response.read() )
@@ -96,8 +94,7 @@ def get_url_txt(the_url, enablePK=False):
 
     response.close()
 
-    # log("--data--")
-    # log(data)
+    log("html.get_url_txtExit")
     return data
 
 
