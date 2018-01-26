@@ -24,7 +24,6 @@ def is_cached_content_expired(last_update):
 
 def get_cached_content(path, enablePK=True):
     """ function docstring """
-    log("--get_cached_content----START--")
     content = None
     try:
         filename = get_cached_filename(path)
@@ -38,7 +37,6 @@ def get_cached_content(path, enablePK=True):
                 traceback.print_exc()
     except StandardError:
         return None
-    log(content)
     return content
 
 def get_cached_filename(path):
@@ -46,7 +44,7 @@ def get_cached_filename(path):
     filename = "%s" % _hash(repr(path)).hexdigest()
     return os.path.join(ADDON_CACHE_BASEDIR, filename)
 
-    
+
 def log(msg):
     """ function docstring """
     if xbmcaddon.Addon().getSetting('DebugMode') == 'true':
