@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # encoding=utf8
 
-import urllib2, parse, cache, re, xbmcaddon, html, xbmc, datetime, time, copy
+import urllib2, cache, re, xbmcaddon, html, xbmc, datetime, time, copy
 import simplejson as json
 import xml.etree.ElementTree as ET
 from BeautifulSoup import BeautifulSoup
@@ -16,7 +16,7 @@ LABEL = 'label'
 FILTRES = '{"content":{"genreId":"","mediaBundleId":-1,"afficherTous":false},"show":{"' + SEASON + '":"","' + EPISODE + '":"","' + LABEL + '":""},"fullNameItems":[],"sourceId":""}'
 INTEGRAL = 'Integral'
 
-def getCopy(item):
+def GetCopy(item):
     return copy.deepcopy(item)
 
 def u(data):
@@ -62,7 +62,7 @@ def AddItemToList(jsonSection,infoDict,filtres):
         newItem = {   'genreId': 1,
                       'title': urllib2.unquote(u(infoDict['title'])),
                       'sourceUrl' : url,
-                      'filtres' : parse.getCopy(filtres)
+                      'filtres' : GetCopy(filtres)
                   }
 
         newItem['url'] = "url"
@@ -125,7 +125,7 @@ def AddItemToList(jsonSection,infoDict,filtres):
             return listItems
 
         newItem = {   'genreId': 1,
-                      'filtres' : parse.getCopy(filtres)
+                      'filtres' : GetCopy(filtres)
                   }
 
         newItem['title'] = urllib2.unquote(u(infoDict['title']))
@@ -198,7 +198,7 @@ def LoadMainMenu(filtres):
                           'plot': ".",
                           'image' : xbmcaddon.Addon().getAddonInfo('path')+'/icon.png',
                           'url' : u(carte['pageId']),
-                          'filtres' : parse.getCopy(filtres)
+                          'filtres' : GetCopy(filtres)
                       }
 
             newItem['filtres']['content']['url'] = carte['pageId']
@@ -219,8 +219,8 @@ def LoadMainMenu(filtres):
             #    liste.append(newItem)
 
     log("content.LoadMainMenuExit")
-    return liste
-
+    return liste   
+    
 def log(msg):
     """ function docstring """
     if xbmcaddon.Addon().getSetting('DebugMode') == 'true':

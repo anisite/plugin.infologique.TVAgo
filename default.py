@@ -3,7 +3,7 @@
 import os, urllib, sys, traceback, xbmcplugin, xbmcaddon, xbmc, simplejson, xbmcgui
 
 from BeautifulSoup import BeautifulSoup
-from resources.lib import content, parse, navig
+from resources.lib import content, navig
 
 def Load():
     log("default.Load")
