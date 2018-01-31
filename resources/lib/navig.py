@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys,urllib, xbmcgui, xbmcplugin, xbmcaddon,re,cache, simplejson, xbmc
+import sys, urllib, xbmcgui, xbmcplugin, xbmcaddon, re, cache, simplejson, xbmc, html
 from BeautifulSoup import BeautifulSoup
 
 ADDON = xbmcaddon.Addon()
@@ -10,66 +10,54 @@ THEPLATFORM_CONTENT_URL = "https://edge.api.brightcove.com/playback/v1/accounts/
 
 __handle__ = int(sys.argv[1])
 
-def ajouterItemAuMenu(items):
+def AddItemInMenu(items):
     for item in items:
         if item['isDir'] == True:
-            ajouterRepertoire(item)
-            #xbmc.executebuiltin('Container.SetViewMode(512)') # "Info-wall" view. 
-            
+            AddFolder(item)
         else:
-            ajouterVideo(item)
-            #xbmc.executebuiltin('Container.SetViewMode('+str(xbmcplugin.SORT_METHOD_DATE)+')')
-            #xbmc.executebuiltin('Container.SetSortDirection(0)')
+            AddVideo(item)
 
     if items:
-        if items[0]['forceSort']  :
+        if items[0]['sortable']  :
             xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
             xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_DATE)
-            
 
+def AddFolder(show):
 
-
-def ajouterRepertoire(show):
-    #print "--Show image--"
-    #print show
-    
-    nom = show['nom']
-    url = show['url']
-    iconimage =show['image']
-    genreId = show['genreId']
-    resume = remove_any_html_tags(show['resume'])
-    fanart = show['fanart']
+    strTitle = show['title']
+    strURL = show['url']
+    strImage =show['image']
+    strPlot = remove_any_html_tags(show['plot'])
+    strFanart = show['fanart']
     filtres = show['filtres']
 
-    if resume=='':
-        resume = urllib.unquote(ADDON.getAddonInfo('id')+' v.'+ADDON.getAddonInfo('version'))
+    if strPlot=='':
+        strPlot = urllib.unquote(ADDON.getAddonInfo('id') + ' v.' + ADDON.getAddonInfo('version'))
     if ADDON.getSetting('EmissionNameInPlotEnabled') == 'true':
-        resume = '[B]'+nom+'[/B][CR]'+urllib.unquote(resume)
-    if iconimage=='':
-        iconimage = ADDON_IMAGES_BASEPATH+'default-folder.png'
+        strPlot = '[B]' + strTitle + '[/B][CR]' + urllib.unquote(strPlot)
+    if strImage=='':
+        strImage = ADDON_IMAGES_BASEPATH+'default-folder.png'
 
     """ function docstring """
-    entry_url = sys.argv[0]+"?url="+url+\
-        "&mode=1"+\
-        "&filters="+urllib.quote(simplejson.dumps(filtres))
-  
-    is_it_ok = True
-    liz = xbmcgui.ListItem(nom,iconImage=iconimage,thumbnailImage=iconimage)
+    entry_url = sys.argv[0] + "?url=" + strURL + "&mode=1" + "&filters=" + urllib.quote(simplejson.dumps(filtres))
+
+    bResult = True
+    liz = xbmcgui.ListItem(strTitle, iconImage=strImage, thumbnailImage=strImage)
 
     liz.setInfo(\
-        type="Video",\
+        type="video",\
         infoLabels={\
-            "Title": nom,\
-            "plot":resume
+            "title": strTitle,\
+            "plot": strPlot
         }\
     )
-    setFanart(liz,fanart)
+    SetFanart(liz, strFanart)
 
-    is_it_ok = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=True)
+    bResult = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=True)
 
-    return is_it_ok
+    return bResult
 
-def setFanart(liz,fanart):
+def SetFanart(liz,fanart):
     if ADDON.getSetting('FanartEnabled') == 'true':
         if ADDON.getSetting('FanartEmissionsEnabled') == 'true':
             liz.setProperty('fanart_image', fanart)
@@ -77,109 +65,90 @@ def setFanart(liz,fanart):
             liz.setProperty('fanart_image', ADDON_FANART)
 
 
-def ajouterVideo(show):
-    name = show['nom']
-    the_url = show['url']
-    iconimage = show['image']
-    url_info = 'none'
-    finDisponibilite = show['endDateTxt']
+def AddVideo(show):
+    strTitle = show['title']
+    strURL = show['url']
+    strImage = show['image']
 
-    resume = show['resume'] #remove_any_html_tags(show['resume'] +'[CR][CR]' + finDisponibilite)
-    duree = show['duree']
-    fanart = show['fanart']
-    sourceUrl = show['sourceUrl']
-    annee = "" #show['startDate'][:4]
-    premiere = show['startDate']
-    episode = show['episodeNo']
-    saison = show['seasonNo']
-    
-    is_it_ok = True
-    entry_url = sys.argv[0]+"?url="+urllib.quote_plus(the_url)+"&sourceUrl="+urllib.quote_plus(sourceUrl)
+    strPlot = show['plot']
+    strDuration = show['duration']
+    strFanart = show['fanart']
+    strSourceUrl = show['sourceUrl']
+    strPremiere = show['startDate']
+    strGenre = show['genre']
+    strRating = show['rating']
 
-    #if resume != '':
-    #    if ADDON.getSetting('EmissionNameInPlotEnabled') == 'true':
-    #        resume = '[B]'+name.lstrip()+'[/B]'+'[CR]'+resume.lstrip() 
-    #else:
-    #    resume = name.lstrip()
+    bResult = True
+    entry_url = sys.argv[0] + "?url=" + urllib.quote_plus(strURL) + "&sourceUrl=" + urllib.quote_plus(strSourceUrl)
 
-    liz = xbmcgui.ListItem(\
-        remove_any_html_tags(name), iconImage=ADDON_IMAGES_BASEPATH+"default-video.png", thumbnailImage=iconimage)
+    liz = xbmcgui.ListItem(remove_any_html_tags(strTitle), iconImage=ADDON_IMAGES_BASEPATH+"default-video.png", thumbnailImage=strImage)
     liz.setInfo(\
-        type="Video",\
+        type="video",\
         infoLabels={\
-            "Title":remove_any_html_tags(name),\
-            "Plot":remove_any_html_tags(resume, False),\
-            "Duration":duree,\
-            "Year":annee,\
-            "Premiered":premiere,\
-            "Episode":episode,\
-            "Season":saison}\
+            "title":remove_any_html_tags(strTitle),\
+            "plot":remove_any_html_tags(strPlot, False),\
+            "duration":strDuration,\
+            "premiered":strPremiere,\
+            "genre":strGenre,\
+            "mpaa":strRating}\
     )
     liz.addContextMenuItems([('Informations', 'Action(Info)')])
-    setFanart(liz,fanart)
+    SetFanart(liz, strFanart)
     liz.setProperty('IsPlayable', 'true')
 
-    is_it_ok = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=False)
-    return is_it_ok
+    bResult = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=False)
+    return bResult
 
 RE_HTML_TAGS = re.compile(r'<[^>]+>')
 RE_AFTER_CR = re.compile(r'\n.*')
 
-def jouer_video(source_url):
+def PlayVideo(source_url):
     """ function docstring """
+    log("navig.PlayVideo")
     check_for_internet_connection()
     uri = None
-    
-    log("--media_uid--")
-    log(source_url)
-    
-    data = simplejson.loads(cache.get_cached_content(THEPLATFORM_CONTENT_URL + source_url))
-    
-    log("--DATA PLATFORM--")
-    log(data)
-    
-    url = ""
-    
-    for x in data['sources']:
-        #log(x)
-        #log(x['ext_x_version'])
-        if x['ext_x_version'] == "5":
-            url = x['src']
-            break
-    
-    ## Obtenir JSON avec liens RTMP du playlistService
-    #video_json = simplejson.loads(\
-    #    cache.get_cached_content(\
-    #        'http://production.ps.delve.cust.lldns.net/r/PlaylistService/media/%s/getPlaylistByMediaId' % media_uid\
-    #    )\
-    #)
-    #
-    #play_list_item =video_json['playlistItems'][0]
-    #
-    ## Obtient les streams dans un playlist m3u8
-    #m3u8_pl=cache.get_cached_content('https://mnmedias.api.telequebec.tv/m3u8/%s.m3u8' % play_list_item['refId'])
-    #
-    ## Cherche le stream de meilleure qualité
-    #uri = obtenirMeilleurStream(m3u8_pl)   
 
-    #soup = BeautifulSoup(data, convertEntities=BeautifulSoup.HTML_ENTITIES)
-    #video = soup.find("video", { "id" : "videoPlayer" })
-    
-    #log("video")
-    #log(video)
-    
-    uri = url
-    
-    # lance le stream
-    if uri:
-        #item = xbmcgui.ListItem(\
-        #    "Titre",\
-        #    iconImage=None,\
-        #    thumbnailImage=None, path=uri)
-        play_item = xbmcgui.ListItem(path=uri)
-        xbmcplugin.setResolvedUrl(__handle__,True, play_item)
+    strURL = THEPLATFORM_CONTENT_URL + source_url
+    log("Accessing: " + strURL)
+
+    # Do not use cache or live tv will not work
+    jsonData = simplejson.loads(html.get_url_txt(strURL, True))
+
+    log("Returned: ")
+    log(jsonData)
+
+    strSrcUrl = ""
+    strBackSrcUrl = ""
+
+    for x in jsonData['sources']:
+        #log(x)
+
+        # TBD Preferred stream in settings
+        try:
+            if x['ext_x_version'] == "5":
+                strSrcUrl = x['src']
+                break
+            if x['height'] == 1080:
+                strSrcUrl = x['src']
+                break
+        except KeyError:
+            strBackSrcUrl = x['src']
+
+    if strSrcUrl:
+        uri = strSrcUrl
     else:
-        xbmc.executebuiltin('Notification(%s,Incapable d''obtenir lien du video,5000,%s')
+        uri = strBackSrcUrl
+
+    log("src: " + uri)
+
+    # Start the stream
+    if uri:
+        play_item = xbmcgui.ListItem(path=uri)
+        xbmcplugin.setResolvedUrl(__handle__, True, play_item)
+    else:
+        xbmc.executebuiltin('Notification(%s,Unable to get video URL,5000,%s')
+
+    log("navig.PlayVideoExit")
 
 def check_for_internet_connection():
     """ function docstring """
@@ -194,25 +163,6 @@ def remove_any_html_tags(text, crlf=True):
     if crlf == True:
         text = RE_AFTER_CR.sub('', text)
     return text
-
-def obtenirMeilleurStream(pl):
-    maxBW = 0
-    bandWidth=None
-    uri = None
-    for line in pl.split('\n'):
-        if re.search('#EXT-X',line):
-            bandWidth=None
-            try:
-                match  = re.search('BANDWIDTH=(\d+)',line)
-                bandWidth = int(match.group(1))
-            except :
-                bandWidth=None
-        elif line.startswith('http'):
-            if bandWidth!=None:
-                if bandWidth>maxBW:
-                    maxBW = bandWidth
-                    uri = line
-    return uri
 
 def log(msg):
     """ function docstring """

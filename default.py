@@ -5,35 +5,28 @@ import os, urllib, sys, traceback, xbmcplugin, xbmcaddon, xbmc, simplejson, xbmc
 from BeautifulSoup import BeautifulSoup
 from resources.lib import content, parse, navig
 
-def peupler():
-    if filtres['content']['mediaBundleId']>0:
-        creer_liste_videos()
-    elif filtres['content']['genreId']!='':
-        creer_liste_filtree()
+def Load():
+    log("default.Load")
+    if filtres['content']['genreId'] != '':
+        CreateFilteredList()
     else:
-        creer_menu_categories()
+        CreateMainMenu()
+    log("default.LoadExit")
 
-def creer_menu_categories():
+def CreateMainMenu():
     """ function docstring """
-    navig.ajouterItemAuMenu(content.dictOfMainDirs(filtres))
-    navig.ajouterItemAuMenu(content.dictOfGenres(filtres))
-    xbmc.executebuiltin('Container.SetViewMode(55)') # "Info-wall" view. 
+    log("default.CreateMainMenu")
+    navig.AddItemInMenu(content.LoadMainMenu(filtres))
+    xbmc.executebuiltin('Container.SetViewMode(50)') # "List" view.
+    log("default.CreateMainMenuExit")
 
-def creer_liste_filtree():
+def CreateFilteredList():
     """ function docstring """
-    log("---creer_liste_filtree--START----")
+    log("default.CreateFilteredList")
     log(filtres['content']['url'])
-    #if "saisons" in filtres['content']['url'] :
-    navig.ajouterItemAuMenu(content.loadEmission(filtres))
-    #else:
-    #    navig.ajouterItemAuMenu(content.loadListeSaison(filtres))
-    xbmc.executebuiltin('Container.SetViewMode(55)') # "Info-wall" view. 
-
-
-def creer_liste_videos():
-    """ function docstring """
-    log("---creer_liste_videos--START----")
-    navig.ajouterItemAuMenu(parse.ListeVideosGroupees(filtres))
+    navig.AddItemInMenu(content.LoadItems(filtres))
+    xbmc.executebuiltin('Container.SetViewMode(50)') # "List" view.
+    log("default.CreateFilteredListExit")
 
 def get_params():
     """ function docstring """
@@ -54,7 +47,7 @@ def get_params():
 
     return param
 
-def set_content(content):
+def SetContent(content):
     """ function docstring """
     xbmcplugin.setContent(int(sys.argv[1]), content)
     return
@@ -73,7 +66,7 @@ def log(msg):
 
 
 # ---
-log('--- init -----------------')
+log('--- Addon Entry ---')
 # ---
 
 PARAMS = get_params()
@@ -86,12 +79,12 @@ filtres = {}
 
 try:
     URL = urllib.unquote_plus(PARAMS["url"])
-    log("PARAMS['url']:"+URL)
+    log("PARAMS['url']:" + URL)
 except StandardError:
     pass
 try:
     MODE = int(PARAMS["mode"])
-    log("PARAMS['mode']:"+str(MODE))
+    log("PARAMS['mode']:" + str(MODE))
 except StandardError:
     pass
 try:
@@ -104,16 +97,16 @@ except StandardError:
     pass
 
 filtres = simplejson.loads(FILTERS)
-   
+
 if SOURCE_URL !='':
-    navig.jouer_video(SOURCE_URL)
+    navig.PlayVideo(SOURCE_URL)
 
 elif MODE == 99:
     ADDON.openSettings()
-    
+
 else:
-    peupler()
-    set_content('episodes')
+    Load()
+    SetContent('episodes')
 
 
 if MODE is not 99:
