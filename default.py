@@ -2,7 +2,6 @@
 
 import os, urllib, sys, traceback, xbmcplugin, xbmcaddon, xbmc, simplejson, xbmcgui
 
-from BeautifulSoup import BeautifulSoup
 from resources.lib import content, navig
 
 def Load():
@@ -24,7 +23,11 @@ def CreateFilteredList():
     """ function docstring """
     log("default.CreateFilteredList")
     log(filtres['content']['url'])
-    navig.AddItemInMenu(content.LoadItems(filtres))
+    if 'containerId' in filtres['content']:
+        log(filtres['content']['containerId'])
+        navig.AddItemInMenu(content.LoadContainerItems(filtres))
+    else:
+        navig.AddItemInMenu(content.LoadContainers(filtres))
     xbmc.executebuiltin('Container.SetViewMode(50)') # "List" view.
     log("default.CreateFilteredListExit")
 
