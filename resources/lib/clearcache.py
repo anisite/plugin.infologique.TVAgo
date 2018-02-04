@@ -8,7 +8,7 @@ import xbmcgui
 import xbmcvfs
 from xbmcaddon import Addon
 
-addon = Addon('plugin.video.telequebec')
+addon = Addon('plugin.infologique.TVAgo')
 addon_cache_basedir = os.path.join(xbmc.translatePath(addon.getAddonInfo('path')).decode('utf-8'),".cache")
 
 if sys.argv[1].lower() == "full":

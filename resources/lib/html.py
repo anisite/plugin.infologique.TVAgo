@@ -9,60 +9,6 @@ import socket, xbmc, xbmcaddon
 from StringIO import StringIO
 import urllib2, gzip
 
-
-
-# Merci à l'auteur de cette fonction
-def unescape_callback(matches):
-    """ function docstring """
-    html_entities = \
-    {
-        'quot':'\"', 'amp':'&', 'apos':'\'', 'lt':'<',
-        'gt':'>', 'nbsp':' ', 'copy':'©', 'reg':'®',
-        'Agrave':'À', 'Aacute':'Á', 'Acirc':'Â',
-        'Atilde':'Ã', 'Auml':'Ä', 'Aring':'Å',
-        'AElig':'Æ', 'Ccedil':'Ç', 'Egrave':'È',
-        'Eacute':'É', 'Ecirc':'Ê', 'Euml':'Ë',
-        'Igrave':'Ì', 'Iacute':'Í', 'Icirc':'Î',
-        'Iuml':'Ï', 'ETH':'Ð', 'Ntilde':'Ñ',
-        'Ograve':'Ò', 'Oacute':'Ó', 'Ocirc':'Ô',
-        'Otilde':'Õ', 'Ouml':'Ö', 'Oslash':'Ø',
-        'Ugrave':'Ù', 'Uacute':'Ú', 'Ucirc':'Û',
-        'Uuml':'Ü', 'Yacute':'Ý', 'agrave':'à',
-        'aacute':'á', 'acirc':'â', 'atilde':'ã',
-        'auml':'ä', 'aring':'å', 'aelig':'æ',
-        'ccedil':'ç', 'egrave':'è', 'eacute':'é',
-        'ecirc':'ê', 'euml':'ë', 'igrave':'ì',
-        'iacute':'í', 'icirc':'î', 'iuml':'ï',
-        'eth':'ð', 'ntilde':'ñ', 'ograve':'ò',
-        'oacute':'ó', 'ocirc':'ô', 'otilde':'õ',
-        'ouml':'ö', 'oslash':'ø', 'ugrave':'ù',
-        'uacute':'ú', 'ucirc':'û', 'uuml':'ü',
-        'yacute':'ý', 'yuml':'ÿ'
-    }
-
-    entity = matches.group(0)
-    val = matches.group(1)
-
-    try:
-        if entity[:2] == r'\u':
-            return entity.decode('unicode-escape')
-        elif entity[:3] == '&#x':
-            return unichr(int(val, 16))
-        elif entity[:2] == '&#':
-            return unichr(int(val))
-        else:
-            return html_entities[val].decode('utf-8')
-
-    except (ValueError, KeyError):
-        pass
-
-def html_unescape(data):
-    """ function docstring """
-    data = data.decode('utf-8')
-    data = re.sub(r'&#?x?(\w+);|\\\\u\d{4}', unescape_callback, data)
-    data = data.encode('utf-8')
-    return data
-
 def get_url_txt(the_url, enablePK=False):
     """ function docstring """
     log("html.get_url_txt")
@@ -97,7 +43,6 @@ def get_url_txt(the_url, enablePK=False):
     log("html.get_url_txtExit")
     return data
 
-
 def is_network_available(url):
     """ function docstring """
     try:
@@ -109,7 +54,6 @@ def is_network_available(url):
         return True
     except socket.error:
         return False
-
 
 def log(msg):
     """ function docstring """

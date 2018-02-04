@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import sys, urllib, xbmcgui, xbmcplugin, xbmcaddon, re, cache, simplejson, xbmc, html
-from BeautifulSoup import BeautifulSoup
 
 ADDON = xbmcaddon.Addon()
 ADDON_IMAGES_BASEPATH = ADDON.getAddonInfo('path')+'/resources/media/images/'
@@ -118,26 +117,41 @@ def PlayVideo(source_url):
     log(jsonData)
 
     strSrcUrl = ""
-    strBackSrcUrl = ""
 
-    for x in jsonData['sources']:
-        #log(x)
+    for jsonSource in jsonData['sources']:
+        #log(source)
 
         # TBD Preferred stream in settings
-        try:
-            if x['ext_x_version'] == "5":
-                strSrcUrl = x['src']
+        if 'ext_x_version' in jsonSource:
+            if jsonSource['ext_x_version'] == "5":
+                if 'src' in jsonSource:
+                    strSrcUrl = jsonSource['src']
+                    break
+        elif 'height' in jsonSource:
+            nHeight = jsonSource['height']
+            if nHeight == 1080:
+                if 'src' in jsonSource:
+                    strSrcUrl = jsonSource['src']
+                    break
+            elif nHeight == 540:
+                if 'src' in jsonSource:
+                    strSrcUrl = jsonSource['src']
+                    break
+            elif nHeight == 360:
+                if 'src' in jsonSource:
+                    strSrcUrl = jsonSource['src']
+                    break
+            elif nHeight == 270:
+                if 'src' in jsonSource:
+                    strSrcUrl = jsonSource['src']
+                    break
+        else:
+            if 'src' in jsonSource:
+                strSrcUrl = jsonSource['src']
                 break
-            if x['height'] == 1080:
-                strSrcUrl = x['src']
-                break
-        except KeyError:
-            strBackSrcUrl = x['src']
 
     if strSrcUrl:
         uri = strSrcUrl
-    else:
-        uri = strBackSrcUrl
 
     log("src: " + uri)
 

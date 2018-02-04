@@ -3,9 +3,6 @@
 
 import urllib2, cache, re, xbmcaddon, html, xbmc, datetime, time, copy
 import simplejson as json
-import xml.etree.ElementTree as ET
-from BeautifulSoup import BeautifulSoup
-from BeautifulSoup import BeautifulStoneSoup, Tag, NavigableString
 
 BASE_URL = 'https://viamw-android-adapter.viago.io'
 MEDIA_BUNDLE_URL = BASE_URL + 'MediaBundle/'
@@ -21,6 +18,127 @@ def GetCopy(item):
 
 def u(data):
     return data.encode('utf-8') #.decode('string_escape').decode('utf8')
+
+def LoadContainers(filtres):
+    log("content.LoadContainers")
+    log(filtres)
+
+    strURL = BASE_URL + "/page/"+ filtres['content']['url'] +"?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"
+    log("Accessing: " + strURL)
+    jsonData = json.loads(cache.get_cached_content(strURL), encoding='utf-8')
+    log("Returned:")
+    log(jsonData)
+
+    jsonItems = jsonData['item']
+    jsonContainers = jsonData['container']
+
+    if 'containerId' in filtres['content']:
+        log('Current container ID:')
+        log(filtres['content']['containerId'])
+
+    listContainers = []
+    for jsonContainer in jsonContainers :
+
+        # Array of container attributes
+        aContAttributes = {}
+        log(jsonContainer['attributes'])
+        for s in jsonContainer['attributes']:
+            aContAttributes[s['key']] = s['value']
+
+        # Get container title
+        strContainerTitle = ""
+        if 'title' in aContAttributes:
+            strContainerTitle = urllib2.unquote(u(aContAttributes['title']))
+
+        listItems = []
+
+        # List the items in the container
+        if 'itemId' in jsonContainer:
+            jsonItemsInContainer = jsonContainer['itemId']
+
+            listItems = []
+            for jsonItem in jsonItems:
+                if jsonItem['id'] in jsonItemsInContainer:
+                    aItemAttributes = {}
+                    for s in jsonItem['attributes']:
+                        aItemAttributes[s['key']] = s['value']
+
+                    listItems = listItems + AddItemToList(jsonItem, aItemAttributes, filtres)
+
+
+        # No inner items, skip container
+        if len(listItems) == 0:
+            continue
+
+        # Container has no title, add inner items
+        elif strContainerTitle == "":
+            listContainers = listContainers + listItems
+
+        # Container title is a single character, add inner items.
+        # This is to directly show alphabetically contained items.
+        elif len(strContainerTitle) == 1:
+            listContainers = listContainers + listItems
+
+        # Only one container, add inner items
+        elif len(jsonContainers) == 1:
+            listContainers = listContainers + listItems
+
+        # Show the container
+        else:
+            newContainer = {   'genreId': 1,
+                               'title': strContainerTitle,
+                               'filtres' : GetCopy(filtres)
+                           }
+
+            newContainer['image'] = xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
+            newContainer['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
+
+            newContainer['url'] = newContainer['filtres']['content']['url']
+            newContainer['containerId'] = urllib2.unquote(u(jsonContainer['id']))
+            newContainer['plot'] = "."
+
+            newContainer['filtres']['content']['containerId'] =  newContainer['containerId']
+            newContainer['filtres']['content']['genreId'] = newContainer['genreId']
+
+            newContainer['isDir'] = True
+            newContainer['sortable'] = True
+
+            listContainers.append(newContainer)
+
+    log("content.LoadContainersExit")
+    return listContainers
+
+def LoadContainerItems(filtres):
+    log("content.LoadContainerItems")
+    log(filtres)
+
+    strURL = BASE_URL + "/page/"+ filtres['content']['url'] +"?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"
+    log("Accessing: " + strURL)
+    jsonData = json.loads(cache.get_cached_content(strURL), encoding='utf-8')
+    log("Returned:")
+    log(jsonData)
+
+    jsonContainers = jsonData['container']
+
+    # Get the item ids for the selected container
+    for jsonContainer in jsonContainers :
+        if urllib2.unquote(u(jsonContainer['id'])) == filtres['content']['containerId']:
+            jsonItemsInContainer = jsonContainer['itemId']
+
+    jsonItems = jsonData['item']
+
+    listItems = []
+    for jsonItem in jsonItems :
+        if jsonItem['id'] in jsonItemsInContainer:
+            log(jsonItem['attributes'])
+            dict = {}
+            for s in jsonItem['attributes']:
+                dict[s['key']] = s['value']
+
+            listItems = listItems + AddItemToList(jsonItem, dict, filtres)
+
+    log("content.LoadContainerItemsExit")
+    return listItems
 
 def LoadItems(filtres):
     log("content.LoadItems")
@@ -104,6 +222,10 @@ def AddItemToList(jsonSection,infoDict,filtres):
 
         newItem['fanart'] = None
 
+        # not a container remove the id
+        if 'containerId' in newItem['filtres']['content']:
+            del newItem['filtres']['content']['containerId']
+
         newItem['filtres']['content']['genreId'] = newItem['genreId']
         newItem['filtres']['content']['url'] = url
 
@@ -119,10 +241,6 @@ def AddItemToList(jsonSection,infoDict,filtres):
             if filtres['content']['url'] == infoDict['pageId']:
                 log("content.AddItemToList: Current page item, skipping")
                 return listItems
-
-        if u(infoDict['title']) == "":
-            log("content.AddItemToList: No title item, skipping")
-            return listItems
 
         newItem = {   'genreId': 1,
                       'filtres' : GetCopy(filtres)
@@ -157,6 +275,10 @@ def AddItemToList(jsonSection,infoDict,filtres):
         newItem['isDir'] = True
         newItem['sortable'] = True
 
+        # not a container remove the id
+        if 'containerId' in newItem['filtres']['content']:
+            del newItem['filtres']['content']['containerId']
+
         newItem['filtres']['content']['genreId'] = newItem['genreId']
 
         listItems.append(newItem)
@@ -185,7 +307,6 @@ def LoadMainMenu(filtres):
 
     jsonMenuItems = jsonConfig['menu']['menuItems']
 
-    i=1
     liste = []
 
     for carte in jsonMenuItems :
@@ -193,7 +314,7 @@ def LoadMainMenu(filtres):
             log(u(carte['title']) + ":")
             log(carte)
 
-            newItem = {   'genreId': i,
+            newItem = {   'genreId': 1,
                           'title': urllib2.unquote(u(carte['title'])),
                           'plot': ".",
                           'image' : xbmcaddon.Addon().getAddonInfo('path')+'/icon.png',
@@ -219,8 +340,8 @@ def LoadMainMenu(filtres):
             #    liste.append(newItem)
 
     log("content.LoadMainMenuExit")
-    return liste   
-    
+    return liste
+
 def log(msg):
     """ function docstring """
     if xbmcaddon.Addon().getSetting('DebugMode') == 'true':
