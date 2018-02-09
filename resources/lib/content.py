@@ -339,6 +339,28 @@ def LoadMainMenu(filtres):
             #    newItem['title'] = newItem['title'] + " - NON FUNCTIONNAL"
             #    liste.append(newItem)
 
+    # Add start page container
+    strStartPageUrl = jsonConfig['startPage']
+
+    newContainer = {   'genreId': 1,
+                       'title': "Acceuil",
+                       'filtres' : GetCopy(filtres)
+                   }
+
+    newContainer['image'] = xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
+    newContainer['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
+
+    newContainer['url'] = strStartPageUrl
+    newContainer['plot'] = "Éléments disponibles sur la page d'acceuil"
+
+    newContainer['filtres']['content']['url'] =  newContainer['url']
+    newContainer['filtres']['content']['genreId'] = newContainer['genreId']
+
+    newContainer['isDir'] = True
+    newContainer['sortable'] = True
+
+    liste.append(newContainer)
+
     log("content.LoadMainMenuExit")
     return liste
 
