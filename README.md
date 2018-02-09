@@ -13,6 +13,8 @@ Tout le contenu vidéo reste propriété de TVA et est disponible légalement et
 
 # ** IMPORTANT **
 
+Du au besoin de TLS 1.2, cet addon ne fonctionne que sur Kodi Krypton et plus récent (17+). Le python qui est livré avec Jarvis et plus vieux (16-) ne supporte pas TLS 1.2.
+
 Le fonctionnement de cet addon est dépendant de celui du site TVA, tout changement au fonctionnement interne du site peut le briser.
 Si c'est le cas, une mise à jour devrait suivre, sinon, entrez un issue afin de nous informer du problème.
 
