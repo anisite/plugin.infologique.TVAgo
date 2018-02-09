@@ -343,7 +343,7 @@ def LoadMainMenu(filtres):
     strStartPageUrl = jsonConfig['startPage']
 
     newContainer = {   'genreId': 1,
-                       'title': "Acceuil",
+                       'title': "Accueil",
                        'filtres' : GetCopy(filtres)
                    }
 
@@ -351,7 +351,7 @@ def LoadMainMenu(filtres):
     newContainer['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
 
     newContainer['url'] = strStartPageUrl
-    newContainer['plot'] = "Éléments disponibles sur la page d'acceuil"
+    newContainer['plot'] = "."
 
     newContainer['filtres']['content']['url'] =  newContainer['url']
     newContainer['filtres']['content']['genreId'] = newContainer['genreId']
