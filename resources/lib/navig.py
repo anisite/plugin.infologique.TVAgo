@@ -116,43 +116,14 @@ def PlayVideo(source_url):
     log("Returned: ")
     log(jsonData)
 
-    strSrcUrl = ""
+    bitrate = 0
+    for source in jsonData['sources']:
+        if 'avg_bitrate' in source:
+            if source['avg_bitrate'] > bitrate:
+                bitrate = source['avg_bitrate']
+                uri = source['src']
 
-    for jsonSource in jsonData['sources']:
-        #log(source)
-
-        # TBD Preferred stream in settings
-        if 'ext_x_version' in jsonSource:
-            if jsonSource['ext_x_version'] == "5":
-                if 'src' in jsonSource:
-                    strSrcUrl = jsonSource['src']
-                    break
-        elif 'height' in jsonSource:
-            nHeight = jsonSource['height']
-            if nHeight == 1080:
-                if 'src' in jsonSource:
-                    strSrcUrl = jsonSource['src']
-                    break
-            elif nHeight == 540:
-                if 'src' in jsonSource:
-                    strSrcUrl = jsonSource['src']
-                    break
-            elif nHeight == 360:
-                if 'src' in jsonSource:
-                    strSrcUrl = jsonSource['src']
-                    break
-            elif nHeight == 270:
-                if 'src' in jsonSource:
-                    strSrcUrl = jsonSource['src']
-                    break
-        else:
-            if 'src' in jsonSource:
-                strSrcUrl = jsonSource['src']
-                break
-
-    if strSrcUrl:
-        uri = strSrcUrl
-
+    log("bitrate: " + str(bitrate))
     log("src: " + uri)
 
     # Start the stream
