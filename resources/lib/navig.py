@@ -118,6 +118,8 @@ def PlayVideo(source_url):
 
     bitrate = 0
     for source in jsonData['sources']:
+        if bitrate == 0:
+            uri = source['src']
         if 'avg_bitrate' in source:
             if source['avg_bitrate'] > bitrate:
                 bitrate = source['avg_bitrate']

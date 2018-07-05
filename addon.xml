@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.infologique.TVAgo" name="TVA" version="1.0.2" provider-name="anisite, MaximeLussier">
+<addon id="plugin.infologique.TVAgo" name="TVA" version="1.0.3" provider-name="anisite, MaximeLussier">
   <requires>
     <import addon="xbmc.python" version="2.25.0"/>
     <import addon="script.module.simplejson" version="2.0.10"/>
@@ -14,8 +14,7 @@
 -Rattrapez les émissions des quelques derniers jours
 -Découvrez certaines émissions des chaînes spécialisées du Groupe TVA : AddikTV, Casa, Moi&amp;cie, Prise 2 et Yoopa
 -Explorez des primeurs, des exclusivités, des vidéos inédites et différentes thématiques</description>
-    <news>v1.0.0  (2018-02-04) - Première version complète fonctionnelle.
-v1.0.1 (2018-02-09) - https://videos.tva.ca/ nécessite TLS 1.2 seulement disponible sur Krypton (17).</news>
+    <news>v1.0.3 (2018-07-05) - Correction pour les vidéos qui ne jouent pas.</news>
     <language>fr</language>
     <source>https://github.com/anisite/plugin.infologique.TVAgo</source>
   </extension>
