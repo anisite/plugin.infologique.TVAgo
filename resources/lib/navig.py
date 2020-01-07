@@ -180,7 +180,7 @@ def PlayVideo(source_url):
                 nBitrate = 0;
                 nHRes = 0;
                 nVRes = 0;
-        if 'avg_bitrate' in source:
+                if 'avg_bitrate' in source:
                     nBitrate = source['avg_bitrate'];
                 if 'width' in source:
                     nHRes = source['width'];
