@@ -2,12 +2,27 @@
 <strings>
     <!-- GENERALITE -->
     <string id="32000">Configuration</string>
-    <string id="32110">Advances settings</string>
-    <string id="32100">Apparence</string>
+    <string id="32110">Advanced settings</string>
+    <string id="32100">Appearance</string>
     <string id="32101">Enable the addon fanart</string>
     <string id="32102">If available, use the tv-show image as fanart</string>
     <string id="32114">Show tv-show name in the description section</string>
     <string id="32115">Verify network and web site connectivity</string>
+    <string id="32116">Preferred resolution</string>
+    <string id="32117">Preferred bitrate</string>
+
+    <!-- RESOLUTION -->
+    <string id="33000">Maximum</string>
+    <string id="33001">1920x1080</string>
+    <string id="33002">1280x720</string>
+    <string id="33003">960x540</string>
+    <string id="33004">640x360</string>
+    <string id="33005">480x270</string>
+    <string id="33100">Minumum</string>
+
+    <!-- BITRATE -->
+    <string id="34000">Maximum</string>
+    <string id="34001">Minumum</string>
 
     <!-- CACHE -->
     <string id="32105">Cache</string>
@@ -46,7 +61,6 @@
     <string id="32103">Miscellaneous</string>
     <string id="32104">Debug mode - Consult the kodi log file</string>
     <string id="32112">OUTCH! ERROR!</string>
-    <string id="32113">The Tele-Quebec web site zonevideo.telequebec.tv or network is unavailable?!</string>
     <string id="32120">EMPTY DIRECTORY</string>
     <string id="32121">The selected directory do not contains any video</string>
 

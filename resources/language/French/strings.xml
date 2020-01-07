@@ -7,7 +7,21 @@
     <string id="32101">Activer le fanart de l'addiciel</string>
     <string id="32102">Si disponible, utiliser l'image de l'émission en fanart</string>
     <string id="32114">Afficher le nom de l'émission dans le section descriptive</string>
-    <string id="32115">Vérifiez la connectivité au réseau et du site web</string>
+    <string id="32116">Résolution préférée</string>
+    <string id="32117">Bitrate préféré</string>
+
+    <!-- RESOLUTION -->
+    <string id="33000">Maximum</string>
+    <string id="33001">1920x1080</string>
+    <string id="33002">1280x720</string>
+    <string id="33003">960x540</string>
+    <string id="33004">640x360</string>
+    <string id="33005">480x270</string>
+    <string id="33100">Minumum</string>
+
+    <!-- BITRATE -->
+    <string id="34000">Maximum</string>
+    <string id="34001">Minumum</string>
 
     <!-- CACHE -->
     <string id="32105">Cache</string>
@@ -44,9 +58,8 @@
 
     <!-- OTHERS -->
     <string id="32103">Divers</string>
-    <string id="32104">Mode débogue - Consultez le fichier des logs de Kodi</string>
+    <string id="32104">Mode débogage - Consultez le fichier des logs de Kodi</string>
     <string id="32112">OUTCH! ERREUR!</string>
-    <string id="32113">Le site internet zonevideo.telequebec.tv de Télé-Québec ne peut être rejoint ou votre réseau est présentement non-disponible.</string>
     <string id="32120">RÉPERTOIRE VIDE</string>
     <string id="32121">Le répertoire sélectionné ne contient aucune vidéo</string>
 

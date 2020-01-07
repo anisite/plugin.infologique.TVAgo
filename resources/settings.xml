@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <!-- APPARENCE -->
     <category label="32100">
@@ -9,11 +9,13 @@
 
     <!-- ADVANCE -->
     <category label="32110">
+        <setting label="32116" type="enum" id="PreferedResolution" lvalues="33000|33001|33002|33003|33004|33005|33100" default="Maximum" />
+        <setting label="32117" type="enum" id="PreferedBitrate" lvalues="34000|34001" default="Maximum" />
+        <setting type="lsep" /> -->
         <setting label="32122" type="bool" id="DeleteTempFiFilesEnabled" default="false"/>
         <setting label="32106" type="enum" id="CacheTTL" lvalues="32200|32201|32202|32203|32204|32205|32206|32207|32208|32209|32210|32211|32212|32213|32214|32215|32216|32217|32218|32219|32220|32221|32222|32223|32224|32225|32226|32227|32228|32229|32230|32231|32232|32233|32234|32235|32236|32237|32238|32239|32240|32241|32242|32243|32244|32245|32246|32247|32248|32249|32250|32251|32252|32253|32254|32255|32256|32257|32258|32259|32260|32261|32262|32263|32264|32265|32266|32267|32268|32269|32270|32271|32272|32273" default="24" />
         <setting label="32107" type="action" action="RunScript($CWD/resources/lib/clearcache.py,full)" default="" />
         <setting type="lsep" /> -->
-        <setting label="32115" type="bool" id="NetworkDetection" default="true"/>
         <setting label="32104" type="bool" id="DebugMode" default="false"/>
     </category> 
 
