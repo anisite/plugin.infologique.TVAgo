@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-import sys, urllib, xbmcgui, xbmcplugin, xbmcaddon, re, cache, simplejson, xbmc, html, m3u8, inputstreamhelper
+import sys, urllib, xbmcgui, xbmcplugin, xbmcaddon, re, cache, simplejson, xbmc, html, inputstreamhelper
 
 ADDON = xbmcaddon.Addon()
 ADDON_IMAGES_BASEPATH = ADDON.getAddonInfo('path')+'/resources/media/images/'
@@ -150,31 +150,28 @@ def PlayVideo(source_url):
                             if 'license_url' in keySystems['widevine']:
                                 aStream.strLicUri = keySystems['widevine']['license_url'];
                     streams.append(aStream)
-                elif source['type'] == "application/x-mpegURL":
-                    log("Unsupported stream")
-                    # nBitrate = 10000;
-                    # nHRes = 1920;
-                    # nVRes = 1080;
-                    # aStream = stream(source['src'], nBitrate, nHRes, nVRes)
-                    # aStream.strProtocol = "hls";
-                    # streams.append(aStream)
-                elif "master.m3u8" in source['src']:
-                    variant_m3u8 = m3u8.loads(html.get_url_txt(source['src'], True))
-                    for playlist in variant_m3u8.playlists:
-                        nBitrate = 0;
-                        nHRes = 0;
-                        nVRes = 0;
-                        if playlist.stream_info.bandwidth:
-                            nBitrate = playlist.stream_info.bandwidth
-                        if playlist.stream_info.resolution and len(playlist.stream_info.resolution) == 2:
-                            nHRes = playlist.stream_info.resolution[0];
-                            nVRes = playlist.stream_info.resolution[1];
-                        if source['type'] == "application/vnd.apple.mpegurl":
-                            pUri = playlist.uri.split('?', 2)[0] + "?" + source['src'].split('?', 2)[1]
-                        else:
-                            pUri = playlist.uri
-                        aStream = stream(pUri, nBitrate, nHRes, nVRes)
-                        streams.append(aStream)
+                elif source['type'] == "application/x-mpegURL" or source['type'] == "application/vnd.apple.mpegurl":
+                    nBitrate = 10000;
+                    nHRes = 1920;
+                    nVRes = 1080;
+                    aStream = stream(source['src'], nBitrate, nHRes, nVRes)
+                    aStream.strProtocol = "hls";
+                    streams.append(aStream)
+                else:
+                    # Unknown source, try to use as is...
+                    log("Unknown source:")
+                    log(source)
+                    nBitrate = 0;
+                    nHRes = 0;
+                    nVRes = 0;
+                    if 'avg_bitrate' in source:
+                        nBitrate = source['avg_bitrate'];
+                    if 'width' in source:
+                        nHRes = source['width'];
+                    if 'height' in source:
+                        nVRes = source['height'];
+                    aStream = stream(source['src'], nBitrate, nHRes, nVRes)
+                    streams.append(aStream)
             else:
                 # Direct streams (MP4)
                 nBitrate = 0;
@@ -231,17 +228,17 @@ def PlayVideo(source_url):
         log("lic_uri: " + selectedStream.strLicUri)
         log("drm: " + selectedStream.strDrm)
         log("protocol: " + selectedStream.strProtocol)
+
+        play_item = xbmcgui.ListItem(path=selectedStream.strUri)
+
         if selectedStream.strProtocol != "":
             is_helper = inputstreamhelper.Helper(selectedStream.strProtocol, drm=selectedStream.strDrm)
             if is_helper.check_inputstream():
-                playitem = xbmcgui.ListItem(path=selectedStream.strUri)
-                playitem.setProperty('inputstreamaddon', is_helper.inputstream_addon)
-                playitem.setProperty('inputstream.adaptive.manifest_type', selectedStream.strProtocol)
-                playitem.setProperty('inputstream.adaptive.license_type', selectedStream.strDrm)
-                playitem.setProperty('inputstream.adaptive.license_key', selectedStream.strLicUri + '||R{SSM}|')
-                xbmcplugin.setResolvedUrl(__handle__, True, playitem)
-        else:
-            play_item = xbmcgui.ListItem(path=selectedStream.strUri)
+                play_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
+                play_item.setProperty('inputstream.adaptive.manifest_type', selectedStream.strProtocol)
+                play_item.setProperty('inputstream.adaptive.license_type', selectedStream.strDrm)
+                play_item.setProperty('inputstream.adaptive.license_key', selectedStream.strLicUri + '||R{SSM}|')
+
         xbmcplugin.setResolvedUrl(__handle__, True, play_item)
     else:
         xbmc.executebuiltin('Notification(%s,Unable to get video URL,5000,%s')
