@@ -1,11 +1,22 @@
 # -*- coding: utf-8 -*-
 # encoding=utf8
 
-import urllib2, cache, re, xbmcaddon, html, xbmc, datetime, time, copy
+import sys, re, xbmcaddon, xbmc, datetime, time, copy
+from . import cache, html
 import simplejson as json
 
-BASE_URL = 'https://viamw-android-adapter.viago.io'
-MEDIA_BUNDLE_URL = BASE_URL + 'MediaBundle/'
+if sys.version_info.major >= 3:
+    # Python 3 stuff
+    from urllib.parse import unquote, quote_plus, unquote_plus, urljoin, urlparse
+    from urllib.request import Request, urlopen
+else:
+    # Python 2 stuff
+    from urlparse import urljoin, urlparse
+    from urllib import quote_plus, unquote_plus, unquote
+    from urllib2 import Request, urlopen
+
+BASE_URL_SLUG = 'https://www.qub.ca/proxy/pfu/content-delivery-service/v1/entities?slug='
+#MEDIA_BUNDLE_URL = BASE_URL + 'MediaBundle/'
 
 SEASON = 'Saison'
 EPISODE = 'Episode'
@@ -23,87 +34,105 @@ def LoadContainers(filtres):
     log("content.LoadContainers")
     log(filtres)
 
-    strURL = BASE_URL + "/page/"+ filtres['content']['url'] +"?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"
+    strURL = BASE_URL_SLUG + filtres['content']['url']
     log("Accessing: " + strURL)
-    jsonData = json.loads(cache.get_cached_content(strURL), encoding='utf-8')
+    jsonData = json.loads(html.get_url_txt(strURL), encoding='utf-8')
     log("Returned:")
     log(jsonData)
 
-    jsonItems = jsonData['item']
-    jsonContainers = jsonData['container']
+    jsonContainers = jsonData['associatedEntities']
 
-    if 'containerId' in filtres['content']:
-        log('Current container ID:')
-        log(filtres['content']['containerId'])
+    #if 'containerId' in filtres['content']:
+    #    log('Current container ID:')
+    #    log(filtres['content']['containerId'])
 
     listContainers = []
     for jsonContainer in jsonContainers :
+        if 'name' in jsonContainer:
+            if 'tout-voir' in jsonContainer['slug']:
 
-        # Array of container attributes
-        aContAttributes = {}
-        log(jsonContainer['attributes'])
-        for s in jsonContainer['attributes']:
-            aContAttributes[s['key']] = s['value']
+            # Array of container attributes
+            #aContAttributes = {}
+            #log(jsonContainer['attributes'])
+            #for s in jsonContainer['attributes']:
+            #    aContAttributes[s['key']] = s['value']
+    #
+            ## Get container title
+            #strContainerTitle = ""
+            #if 'title' in aContAttributes:
+            #    strContainerTitle = unquote(aContAttributes['title'])
+    #
+            #listItems = []
+    #
+            ## List the items in the container
+            #if 'itemId' in jsonContainer:
+            #    jsonItemsInContainer = jsonContainer['itemId']
+    #
+            #    listItems = []
+            #    for jsonItem in jsonItems:
+            #        if jsonItem['id'] in jsonItemsInContainer:
+            #            aItemAttributes = {}
+            #            for s in jsonItem['attributes']:
+            #                aItemAttributes[s['key']] = s['value']
+    #
+            #            listItems = listItems + AddItemToList(jsonItem, aItemAttributes, filtres)
+    #
+    #
+            ## No inner items, skip container
+            #if len(listItems) == 0:
+            #    continue
+    #
+            ## Container has no title, add inner items
+            #elif strContainerTitle == "":
+            #    listContainers = listContainers + listItems
+    #
+            ## Container title is a single character, add inner items.
+            ## This is to directly show alphabetically contained items.
+            #elif len(strContainerTitle) == 1:
+            #    listContainers = listContainers + listItems
+    #
+            ## Only one container, add inner items
+            #elif len(jsonContainers) == 1:
+            #    listContainers = listContainers + listItems
+    #
+            ## Show the container
+            #else:
+                if 'associatedEntities' in jsonContainer:
+                    for emission in jsonContainer['associatedEntities'] :
+                        insert = True
 
-        # Get container title
-        strContainerTitle = ""
-        if 'title' in aContAttributes:
-            strContainerTitle = urllib2.unquote(u(aContAttributes['title']))
+                        if emission['discriminator'] == 'ExternalLinkPresentationEntity' \
+                             or emission['discriminator'] == 'VideoPresentationEntity':
+                            continue
 
-        listItems = []
+                        for op in listContainers:
+                            if op['containerId'] == emission['slug']:
+                                insert = False
+                                break
+                        
+                        if insert:
+                            newContainer = {'genreId': 1,
+                                            'title': emission['label'],
+                                            'filtres' : GetCopy(filtres)
+                                        }
+                            image = ""
+                            if 'mainImage' in emission:
+                                image = emission['mainImage']['url']
 
-        # List the items in the container
-        if 'itemId' in jsonContainer:
-            jsonItemsInContainer = jsonContainer['itemId']
+                            newContainer['image'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
+                            newContainer['fanart'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
 
-            listItems = []
-            for jsonItem in jsonItems:
-                if jsonItem['id'] in jsonItemsInContainer:
-                    aItemAttributes = {}
-                    for s in jsonItem['attributes']:
-                        aItemAttributes[s['key']] = s['value']
+                            newContainer['url'] = newContainer['filtres']['content']['url']
+                            newContainer['containerId'] = emission['slug']
+                            newContainer['plot'] = "."
 
-                    listItems = listItems + AddItemToList(jsonItem, aItemAttributes, filtres)
+                            newContainer['filtres']['content']['containerId'] =  newContainer['containerId']
+                            newContainer['filtres']['content']['genreId'] = newContainer['genreId']
 
+                            newContainer['isDir'] = True
+                            newContainer['sortable'] = True
 
-        # No inner items, skip container
-        if len(listItems) == 0:
-            continue
-
-        # Container has no title, add inner items
-        elif strContainerTitle == "":
-            listContainers = listContainers + listItems
-
-        # Container title is a single character, add inner items.
-        # This is to directly show alphabetically contained items.
-        elif len(strContainerTitle) == 1:
-            listContainers = listContainers + listItems
-
-        # Only one container, add inner items
-        elif len(jsonContainers) == 1:
-            listContainers = listContainers + listItems
-
-        # Show the container
-        else:
-            newContainer = {   'genreId': 1,
-                               'title': strContainerTitle,
-                               'filtres' : GetCopy(filtres)
-                           }
-
-            newContainer['image'] = xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
-            newContainer['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
-
-            newContainer['url'] = newContainer['filtres']['content']['url']
-            newContainer['containerId'] = urllib2.unquote(u(jsonContainer['id']))
-            newContainer['plot'] = "."
-
-            newContainer['filtres']['content']['containerId'] =  newContainer['containerId']
-            newContainer['filtres']['content']['genreId'] = newContainer['genreId']
-
-            newContainer['isDir'] = True
-            newContainer['sortable'] = True
-
-            listContainers.append(newContainer)
+                            listContainers.append(newContainer)
 
     log("content.LoadContainersExit")
     return listContainers
@@ -112,18 +141,19 @@ def LoadContainerItems(filtres):
     log("content.LoadContainerItems")
     log(filtres)
 
-    strURL = BASE_URL + "/page/"+ filtres['content']['url'] +"?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"
+    strURL = BASE_URL_SLUG + filtres['content']['containerId']
     log("Accessing: " + strURL)
-    jsonData = json.loads(cache.get_cached_content(strURL), encoding='utf-8')
+    jsonData = json.loads(html.get_url_txt(strURL), encoding='utf-8')
     log("Returned:")
     log(jsonData)
 
-    jsonContainers = jsonData['container']
+    jsonContainers = jsonData['knownEntities']['seasons']['associatedEntities']
 
     # Get the item ids for the selected container
-    for jsonContainer in jsonContainers :
-        if urllib2.unquote(u(jsonContainer['id'])) == filtres['content']['containerId']:
-            jsonItemsInContainer = jsonContainer['itemId']
+    for season in jsonContainers :
+        print(season)
+            #if unquote(u(jsonContainer['id'])) == filtres['content']['containerId']:
+            #    jsonItemsInContainer = jsonContainer['itemId']
 
     jsonItems = jsonData['item']
 
@@ -144,9 +174,9 @@ def LoadItems(filtres):
     log("content.LoadItems")
     log(filtres)
 
-    strURL = BASE_URL + "/page/"+ filtres['content']['url'] +"?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"
+    strURL = BASE_URL_SLUG + "/page/"+ filtres['content']['url'] +"?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"
     log("Accessing: " + strURL)
-    jsonData = json.loads(cache.get_cached_content(strURL), encoding='utf-8')
+    jsonData = json.loads(html.get_url_txt(strURL), encoding='utf-8')
     log("Returned:")
     log(jsonData)
 
@@ -178,7 +208,7 @@ def AddItemToList(jsonSection,infoDict,filtres):
         url = infoDict['assetId']
 
         newItem = {   'genreId': 1,
-                      'title': urllib2.unquote(u(infoDict['title'])),
+                      'title': unquote(u(infoDict['title'])),
                       'sourceUrl' : url,
                       'filtres' : GetCopy(filtres)
                   }
@@ -246,7 +276,7 @@ def AddItemToList(jsonSection,infoDict,filtres):
                       'filtres' : GetCopy(filtres)
                   }
 
-        newItem['title'] = urllib2.unquote(u(infoDict['title']))
+        newItem['title'] = unquote(u(infoDict['title']))
 
         if 'image-background' in infoDict:
             newItem['image'] = infoDict['image-background']
@@ -291,80 +321,54 @@ def AddItemToList(jsonSection,infoDict,filtres):
 def LoadMainMenu(filtres):
     log("content.LoadMainMenu")
 
-    strURL = BASE_URL + "/configurations?uuid=5a0f10e5f31d1a2&gid=&appId=5955fc5423eec60006c951ef&locale=en"
+    strURL = BASE_URL_SLUG + "/qubtv-chaines"
     log("Accessing: " + strURL)
-    jsonConfig = json.loads(cache.get_cached_content(strURL, False), encoding='utf-8')
+    jsonConfig = json.loads(html.get_url_txt(strURL, False), encoding='utf-8')
     log("Returned:")
     log(jsonConfig)
 
     # ID of the start page
-    strStartPage = jsonConfig['startPage']
-    log("startPage: " + strStartPage)
+    #strStartPage = jsonConfig['startPage']
+    #log("startPage: " + strStartPage)
 
-    strPolicyKey = jsonConfig['policyKey']
-    xbmcaddon.Addon().setSetting('policyKey', strPolicyKey)
-    log("policyKey: " + strPolicyKey)
+    #strPolicyKey = jsonConfig['policyKey']
+    #xbmcaddon.Addon().setSetting('policyKey', strPolicyKey)
+    #log("policyKey: " + strPolicyKey)
 
-    jsonMenuItems = jsonConfig['menu']['menuItems']
+    jsonMenuItems = jsonConfig['associatedEntities']
 
     liste = []
 
     for carte in jsonMenuItems :
-        if 'pageId' in carte:
-            log(u(carte['title']) + ":")
-            log(carte)
+        #log(u(carte['title']) + ":")
+        #log(carte)
+
+        if 'mainImage' in carte:
+            image = carte['mainImage']['url']
 
             newItem = {   'genreId': 1,
-                          'title': urllib2.unquote(u(carte['title'])),
-                          'plot': ".",
-                          'image' : xbmcaddon.Addon().getAddonInfo('path')+'/icon.png',
-                          'url' : u(carte['pageId']),
-                          'filtres' : GetCopy(filtres)
-                      }
+                            'title': carte['label'],
+                            'plot': "Chaîne " + carte['label'],
+                            'image' : image,
+                            'url' : carte['slug'],
+                            'filtres' : GetCopy(filtres)
+                        }
 
-            newItem['filtres']['content']['url'] = carte['pageId']
+            newItem['filtres']['content']['url'] = carte['slug']
             newItem['isDir'] = True
-            newItem['sortable'] = True
-            newItem['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
+            newItem['sortable'] = False
+            newItem['fanart'] = xbmcaddon.Addon().getAddonInfo('path') + '/resources/fanart.jpg'
             newItem['filtres']['content']['genreId'] = newItem['genreId']
 
-            # Check the different page aliases for the sections.
-            if u(carte['pageAlias']) == "rattrapage" or \
-               u(carte['pageAlias']) == "touslescontenus" or \
-               u(carte['pageAlias']) == "direct" or \
-               u(carte['pageAlias']) == "thematiques":
-                liste.append(newItem)
-            # Usefull for debugging, useless otherwise
-            #else :
-            #    newItem['title'] = newItem['title'] + " - NON FUNCTIONNAL"
-            #    liste.append(newItem)
+            liste.append(newItem)
 
     # Add start page container
-    strStartPageUrl = jsonConfig['startPage']
-
-    newContainer = {   'genreId': 1,
-                       'title': "Accueil",
-                       'filtres' : GetCopy(filtres)
-                   }
-
-    newContainer['image'] = xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
-    newContainer['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
-
-    newContainer['url'] = strStartPageUrl
-    newContainer['plot'] = "."
-
-    newContainer['filtres']['content']['url'] =  newContainer['url']
-    newContainer['filtres']['content']['genreId'] = newContainer['genreId']
-
-    newContainer['isDir'] = True
-    newContainer['sortable'] = True
-
-    liste.append(newContainer)
+    #strStartPageUrl = jsonConfig['startPage']
 
     log("content.LoadMainMenuExit")
     return liste
 
 def log(msg):
     """ function docstring """
-    if xbmcaddon.Addon().getSetting('DebugMode') == 'true':
-        xbmc.log('[%s - DEBUG]: %s' % (xbmcaddon.Addon().getAddonInfo('name'), msg))
+    #if xbmcaddon.Addon().getSetting('DebugMode') == 'true':
+    xbmc.log('[%s - DEBUG]: %s' % (xbmcaddon.Addon().getAddonInfo('name'), msg))

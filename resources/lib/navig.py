@@ -1,6 +1,17 @@
 ﻿# -*- coding: utf-8 -*-
 
-import sys, urllib, xbmcgui, xbmcplugin, xbmcaddon, re, cache, simplejson, xbmc, html, inputstreamhelper
+import sys, xbmcgui, xbmcplugin, xbmcaddon, re, simplejson, xbmc, inputstreamhelper
+
+from . import cache, html
+
+if sys.version_info.major >= 3:
+    # Python 3 stuff
+    from urllib.parse import quote_plus, unquote, quote
+    from urllib.request import Request, urlopen
+else:
+    # Python 2 stuff
+    from urllib import quote_plus, unquote, quote
+    from urllib2 import Request, urlopen
 
 ADDON = xbmcaddon.Addon()
 ADDON_IMAGES_BASEPATH = ADDON.getAddonInfo('path')+'/resources/media/images/'
@@ -29,7 +40,7 @@ def AddItemInMenu(items):
             AddVideo(item)
 
     if items:
-        if items[0]['sortable']  :
+        if items[0]['sortable']:
             xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
             xbmcplugin.addSortMethod(__handle__, xbmcplugin.SORT_METHOD_DATE)
 
@@ -43,18 +54,18 @@ def AddFolder(show):
     filtres = show['filtres']
 
     if strPlot=='':
-        strPlot = urllib.unquote(ADDON.getAddonInfo('id') + ' v.' + ADDON.getAddonInfo('version'))
+        strPlot = unquote(ADDON.getAddonInfo('id') + ' v.' + ADDON.getAddonInfo('version'))
     if ADDON.getSetting('EmissionNameInPlotEnabled') == 'true':
-        strPlot = '[B]' + strTitle + '[/B][CR]' + urllib.unquote(strPlot)
+        strPlot = '[B]' + strTitle + '[/B][CR]' + unquote(strPlot)
     if strImage=='':
         strImage = ADDON_IMAGES_BASEPATH+'default-folder.png'
 
     """ function docstring """
-    entry_url = sys.argv[0] + "?url=" + strURL + "&mode=1" + "&filters=" + urllib.quote(simplejson.dumps(filtres))
+    entry_url = sys.argv[0] + "?url=" + strURL + "&mode=1" + "&filters=" + quote(simplejson.dumps(filtres))
 
     bResult = True
-    liz = xbmcgui.ListItem(strTitle, iconImage=strImage, thumbnailImage=strImage)
-
+    liz = xbmcgui.ListItem(strTitle)
+    liz.setArt({ 'thumb' : strImage } )
     liz.setInfo(\
         type="video",\
         infoLabels={\
@@ -90,21 +101,23 @@ def AddVideo(show):
     strRating = show['rating']
 
     bResult = True
-    entry_url = sys.argv[0] + "?url=" + urllib.quote_plus(strURL) + "&sourceUrl=" + urllib.quote_plus(strSourceUrl)
-
-    liz = xbmcgui.ListItem(remove_any_html_tags(strTitle), iconImage=ADDON_IMAGES_BASEPATH+"default-video.png", thumbnailImage=strImage)
-    liz.setInfo(\
-        type="video",\
-        infoLabels={\
-            "title":remove_any_html_tags(strTitle),\
-            "plot":remove_any_html_tags(strPlot, False),\
-            "duration":strDuration,\
-            "premiered":strPremiere,\
-            "genre":strGenre,\
-            "mpaa":strRating}\
-    )
-    liz.addContextMenuItems([('Informations', 'Action(Info)')])
-    SetFanart(liz, strFanart)
+    entry_url = sys.argv[0] + "?url=" + quote_plus(strURL) + "&sourceUrl=" + quote_plus(strSourceUrl)
+    print("===================================================")
+    print(strTitle)
+    liz = xbmcgui.ListItem(remove_any_html_tags(strTitle))
+    liz.setArt({ 'thumb' : strImage } )
+    #liz.setInfo(\
+    #    type="video",\
+    #    infoLabels={\
+    #        "title":remove_any_html_tags(strTitle),\
+    #        "plot":remove_any_html_tags(strPlot, False),\
+    #        "duration":strDuration,\
+    #        "premiered":strPremiere,\
+    #        "genre":strGenre,\
+    #        "mpaa":strRating}\
+    #)
+    #liz.addContextMenuItems([('Informations', 'Action(Info)')])
+    #SetFanart(liz, strFanart)
     liz.setProperty('IsPlayable', 'true')
 
     bResult = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=False)
@@ -134,69 +147,69 @@ def PlayVideo(source_url):
         if 'src' in source:
             if 'type' in source:
                 if source['type'] == "application/dash+xml":
-                    nBitrate = 10000;
-                    nHRes = 1920;
-                    nVRes = 1080;
+                    nBitrate = 10000
+                    nHRes = 1920
+                    nVRes = 1080
                     aStream = stream(source['src'], nBitrate, nHRes, nVRes)
-                    aStream.strProtocol = "mpd";
+                    aStream.strProtocol = "mpd"
                     if 'key_systems' in source:
-                        keySystems = source['key_systems'];
+                        keySystems = source['key_systems']
                         if 'com.widevine.alpha' in keySystems:
-                            aStream.strDrm = "com.widevine.alpha";
+                            aStream.strDrm = "com.widevine.alpha"
                             if 'license_url' in keySystems['com.widevine.alpha']:
-                                aStream.strLicUri = keySystems['com.widevine.alpha']['license_url'];
+                                aStream.strLicUri = keySystems['com.widevine.alpha']['license_url']
                         elif 'widevine' in keySystems:
-                            aStream.strDrm = "widevine";
+                            aStream.strDrm = "widevine"
                             if 'license_url' in keySystems['widevine']:
-                                aStream.strLicUri = keySystems['widevine']['license_url'];
+                                aStream.strLicUri = keySystems['widevine']['license_url']
                     streams.append(aStream)
                 elif source['type'] == "application/x-mpegURL" or source['type'] == "application/vnd.apple.mpegurl":
-                    nBitrate = 10000;
-                    nHRes = 1920;
-                    nVRes = 1080;
+                    nBitrate = 10000
+                    nHRes = 1920
+                    nVRes = 1080
                     aStream = stream(source['src'], nBitrate, nHRes, nVRes)
-                    aStream.strProtocol = "hls";
+                    aStream.strProtocol = "hls"
                     streams.append(aStream)
                 else:
                     # Unknown source, try to use as is...
                     log("Unknown source:")
                     log(source)
-                    nBitrate = 0;
-                    nHRes = 0;
-                    nVRes = 0;
+                    nBitrate = 0
+                    nHRes = 0
+                    nVRes = 0
                     if 'avg_bitrate' in source:
-                        nBitrate = source['avg_bitrate'];
+                        nBitrate = source['avg_bitrate']
                     if 'width' in source:
-                        nHRes = source['width'];
+                        nHRes = source['width']
                     if 'height' in source:
-                        nVRes = source['height'];
+                        nVRes = source['height']
                     aStream = stream(source['src'], nBitrate, nHRes, nVRes)
                     streams.append(aStream)
             else:
                 # Direct streams (MP4)
-                nBitrate = 0;
-                nHRes = 0;
-                nVRes = 0;
+                nBitrate = 0
+                nHRes = 0
+                nVRes = 0
                 if 'avg_bitrate' in source:
-                    nBitrate = source['avg_bitrate'];
+                    nBitrate = source['avg_bitrate']
                 if 'width' in source:
-                    nHRes = source['width'];
+                    nHRes = source['width']
                 if 'height' in source:
-                    nVRes = source['height'];
+                    nVRes = source['height']
                 aStream = stream(source['src'], nBitrate, nHRes, nVRes)
                 streams.append(aStream)
 
-    nHResPreferred = 0;
+    nHResPreferred = 0
     if ADDON_PREFERRED_RESOLUTION == "1":
-        nHResPreferred = 1920;
+        nHResPreferred = 1920
     elif ADDON_PREFERRED_RESOLUTION == "2":
-        nHResPreferred = 1280;
+        nHResPreferred = 1280
     elif ADDON_PREFERRED_RESOLUTION == "3":
-        nHResPreferred = 960;
+        nHResPreferred = 960
     elif ADDON_PREFERRED_RESOLUTION == "4":
-        nHResPreferred = 640;
+        nHResPreferred = 640
     elif ADDON_PREFERRED_RESOLUTION == "5":
-        nHResPreferred = 480;
+        nHResPreferred = 480
 
     # Sort the streams by resolution closest to preferred
     streams.sort(key=lambda x: abs(x.nHRes - nHResPreferred))
@@ -205,7 +218,7 @@ def PlayVideo(source_url):
     selectedStream = None
     if len(streams) > 0:
         if ADDON_PREFERRED_RESOLUTION == "0":
-            selectedStream = streams[len(streams) - 1];
+            selectedStream = streams[len(streams) - 1]
         else:
             selectedStream = streams[0]
 
@@ -216,9 +229,9 @@ def PlayVideo(source_url):
         sameRes.sort(key=lambda x: x.nBitrate)
         # Take the highest or the lowest
         if ADDON_PREFERRED_BITRATE == "0":
-            selectedStream = sameRes[len(sameRes) - 1];
+            selectedStream = sameRes[len(sameRes) - 1]
         else:
-            selectedStream = sameRes[0];
+            selectedStream = sameRes[0]
 
     # Start the stream
     if selectedStream and selectedStream.strUri:

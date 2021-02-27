@@ -4,16 +4,46 @@
 # version 2.0.2 - By SlySen
 # version 0.2.6 - By CB
 
-import re
+import sys, re
 import socket, xbmc, xbmcaddon
-from StringIO import StringIO
-import urllib2, gzip
+import gzip
+
+if sys.version_info.major >= 3:
+    # Python 3 stuff
+    from urllib.parse import unquote, quote_plus, unquote_plus, urljoin, urlparse
+    from urllib.request import Request, urlopen
+    from io import StringIO as StringIO
+else:
+    # Python 2 stuff
+    from urlparse import urljoin, urlparse
+    from urllib import quote_plus, unquote_plus, unquote
+    from urllib2 import Request, urlopen
+    from StringIO import StringIO
+
+def handleHttpResponse(response):
+
+    if sys.version_info.major >= 3:
+        if response.info().get('Content-Encoding') == 'gzip':
+            f = gzip.GzipFile(fileobj=response)
+            data = f.read()
+            return data
+        else:
+            data = response.read()
+            return data
+    else:
+        if response.info().get('Content-Encoding') == 'gzip':
+            buf = StringIO( response.read() )
+            f = gzip.GzipFile(fileobj=buf)
+            data = f.read()
+            return data
+        else:
+            return response.read()
 
 def get_url_txt(the_url, enablePK=False):
     """ function docstring """
     log("html.get_url_txt")
 
-    req = urllib2.Request(the_url)
+    req = Request(the_url)
     req.add_header(\
                    'User-Agent', \
                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'\
@@ -27,18 +57,9 @@ def get_url_txt(the_url, enablePK=False):
     req.add_header('Connection', 'keep-alive')
     req.add_header('Pragma', 'no-cache')
     req.add_header('Cache-Control', 'no-cache')
-    response = urllib2.urlopen(req)
+    response = urlopen(req)
 
-    data = ""
-
-    if response.info().get('Content-Encoding') == 'gzip':
-        buf = StringIO( response.read() )
-        f = gzip.GzipFile(fileobj=buf)
-        data = f.read()
-    else:
-        data = response.read()
-
-    response.close()
+    data = handleHttpResponse(response)
 
     log("html.get_url_txtExit")
     return data

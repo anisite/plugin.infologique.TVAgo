@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import os, urllib, sys, traceback, xbmcplugin, xbmcaddon, xbmc, simplejson, xbmcgui
+import os, sys, traceback, xbmcplugin, xbmcaddon, xbmc, simplejson, xbmcgui
 
 from resources.lib import content, navig
+
+if sys.version_info.major >= 3:
+    # Python 3 stuff
+    from urllib.parse import quote_plus, unquote_plus, unquote
+else:
+    # Python 2 stuff
+    from urllib import quote_plus, unquote_plus, unquote
 
 def Load():
     log("default.Load")
@@ -81,22 +88,22 @@ FILTERS = ''
 filtres = {}
 
 try:
-    URL = urllib.unquote_plus(PARAMS["url"])
+    URL = unquote_plus(PARAMS["url"])
     log("PARAMS['url']:" + URL)
-except StandardError:
+except Exception:
     pass
 try:
     MODE = int(PARAMS["mode"])
     log("PARAMS['mode']:" + str(MODE))
-except StandardError:
+except Exception:
     pass
 try:
-    FILTERS = urllib.unquote_plus(PARAMS["filters"])
-except StandardError:
+    FILTERS = unquote_plus(PARAMS["filters"])
+except Exception:
     FILTERS = content.FILTRES
 try:
-    SOURCE_URL = urllib.unquote_plus(PARAMS["sourceUrl"])
-except StandardError:
+    SOURCE_URL = unquote_plus(PARAMS["sourceUrl"])
+except Exception:
     pass
 
 filtres = simplejson.loads(FILTERS)
@@ -112,11 +119,11 @@ else:
     SetContent('episodes')
 
 
-if MODE is not 99:
+if MODE != 99:
     #set_sorting_methods(MODE)
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
-if MODE is not 4 and xbmcaddon.Addon().getSetting('DeleteTempFiFilesEnabled') == 'true':
+if MODE != 4 and xbmcaddon.Addon().getSetting('DeleteTempFiFilesEnabled') == 'true':
     PATH = xbmc.translatePath('special://temp').decode('utf-8')
     FILENAMES = next(os.walk(PATH))[2]
     for i in FILENAMES:
