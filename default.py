@@ -23,7 +23,7 @@ def CreateMainMenu():
     """ function docstring """
     log("default.CreateMainMenu")
     navig.AddItemInMenu(content.LoadMainMenu(filtres))
-    xbmc.executebuiltin('Container.SetViewMode(50)') # "List" view.
+    xbmc.executebuiltin('Container.SetViewMode(500)') # "List" view.
     log("default.CreateMainMenuExit")
 
 def CreateFilteredList():
@@ -33,10 +33,12 @@ def CreateFilteredList():
     if 'containerId' in filtres['content']:
         log(filtres['content']['containerId'])
         navig.AddItemInMenu(content.LoadContainerItems(filtres))
+        #xbmc.executebuiltin('Container.SetViewMode(50)') # "List" view.
     else:
         navig.AddItemInMenu(content.LoadContainers(filtres))
-    xbmc.executebuiltin('Container.SetViewMode(50)') # "List" view.
+        xbmc.executebuiltin('Container.SetViewMode(500)') # "List" view.
     log("default.CreateFilteredListExit")
+
 
 def get_params():
     """ function docstring """

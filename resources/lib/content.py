@@ -147,25 +147,52 @@ def LoadContainerItems(filtres):
     log("Returned:")
     log(jsonData)
 
-    jsonContainers = jsonData['knownEntities']['seasons']['associatedEntities']
-
+    listItems = []
+    if jsonData['discriminator'] == 'VideoShowEntity':
     # Get the item ids for the selected container
-    for season in jsonContainers :
-        print(season)
+        for season in jsonData['knownEntities']['seasons']['associatedEntities'] :
+            jsonDataSaison = json.loads(html.get_url_txt(BASE_URL_SLUG + season['slug']), encoding='utf-8')
+
+            for emission in jsonDataSaison['associatedEntities'] :
+                if emission['name'] == 'Épisodes':
+
+                    for episode in emission['associatedEntities'] :
+                        newItem = { 'genreId': 1,
+                                    'title': 'Saison ' + str(season['seasonNumber']) + ' - ' + episode['label'],
+                                    'sourceUrl' : episode['slug'],
+                                    'filtres' : GetCopy(filtres)
+                                    }
+                        newItem['isDir'] = False
+                        newItem['sortable'] = False
+                        newItem['url'] = episode['slug']
+                        newItem['filtres']['content']['containerId'] = season['slug']
+                        newItem['image'] = episode['mainImage']['url']
+                        newItem['fanart'] = episode['mainImage']['url']
+                        newItem['plot'] = episode.get('description')
+                        newItem['duration'] = episode['durationMillis'] / 1000
+                        newItem['startDate'] = episode['activationDate']
+                        newItem['genre'] = ''
+                        newItem['rating'] = ''
+                
+                        listItems.append(newItem)
+               
+
+    elif jsonData['discriminator'] == 'VideoSeasonEntity':
+        print("null")
             #if unquote(u(jsonContainer['id'])) == filtres['content']['containerId']:
             #    jsonItemsInContainer = jsonContainer['itemId']
 
-    jsonItems = jsonData['item']
-
-    listItems = []
-    for jsonItem in jsonItems :
-        if jsonItem['id'] in jsonItemsInContainer:
-            log(jsonItem['attributes'])
-            dict = {}
-            for s in jsonItem['attributes']:
-                dict[s['key']] = s['value']
-
-            listItems = listItems + AddItemToList(jsonItem, dict, filtres)
+    #jsonItems = jsonData['item']
+#
+    #listItems = []
+    #for jsonItem in jsonItems :
+    #    if jsonItem['id'] in jsonItemsInContainer:
+    #        log(jsonItem['attributes'])
+    #        dict = {}
+    #        for s in jsonItem['attributes']:
+    #            dict[s['key']] = s['value']
+#
+    #        listItems = listItems + AddItemToList(jsonItem, dict, filtres)
 
     log("content.LoadContainerItemsExit")
     return listItems

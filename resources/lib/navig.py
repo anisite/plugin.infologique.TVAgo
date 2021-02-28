@@ -106,18 +106,18 @@ def AddVideo(show):
     print(strTitle)
     liz = xbmcgui.ListItem(remove_any_html_tags(strTitle))
     liz.setArt({ 'thumb' : strImage } )
-    #liz.setInfo(\
-    #    type="video",\
-    #    infoLabels={\
-    #        "title":remove_any_html_tags(strTitle),\
-    #        "plot":remove_any_html_tags(strPlot, False),\
-    #        "duration":strDuration,\
-    #        "premiered":strPremiere,\
-    #        "genre":strGenre,\
-    #        "mpaa":strRating}\
-    #)
-    #liz.addContextMenuItems([('Informations', 'Action(Info)')])
-    #SetFanart(liz, strFanart)
+    liz.setInfo(\
+        type="video",\
+        infoLabels={\
+            "title":remove_any_html_tags(strTitle),\
+            "plot":strPlot,\
+            "duration":strDuration,\
+            "premiered":strPremiere,\
+            "genre":strGenre,\
+            "mpaa":strRating}\
+    )
+    liz.addContextMenuItems([('Informations', 'Action(Info)')])
+    SetFanart(liz, strFanart)
     liz.setProperty('IsPlayable', 'true')
 
     bResult = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=False)
@@ -125,6 +125,7 @@ def AddVideo(show):
 
 RE_HTML_TAGS = re.compile(r'<[^>]+>')
 RE_AFTER_CR = re.compile(r'\n.*')
+BASE_URL_SLUG = 'https://www.qub.ca/proxy/pfu/content-delivery-service/v1/entities?slug='
 
 def PlayVideo(source_url):
     """ function docstring """
@@ -133,10 +134,12 @@ def PlayVideo(source_url):
     uri = None
 
     strURL = THEPLATFORM_CONTENT_URL + source_url
+    slugurl = BASE_URL_SLUG + source_url
     log("Accessing: " + strURL)
 
     # Do not use cache or live tv will not work
-    jsonData = simplejson.loads(html.get_url_txt(strURL, True))
+    jsonData = simplejson.loads(html.get_url_txt(slugurl, True))
+    
 
     log("Returned: ")
     log(jsonData)
