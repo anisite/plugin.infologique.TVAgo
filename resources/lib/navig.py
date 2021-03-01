@@ -15,11 +15,10 @@ else:
 
 ADDON = xbmcaddon.Addon()
 ADDON_IMAGES_BASEPATH = ADDON.getAddonInfo('path')+'/resources/media/images/'
-ADDON_FANART = ADDON.getAddonInfo('path') + '/resources/fanart.jpg'
-THEPLATFORM_CONTENT_URL = "https://edge.api.brightcove.com/playback/v1/accounts/5813221784001/videos/"
+ADDON_FANART = ADDON.getAddonInfo('path')+'/fanart.jpg'
+THEPLATFORM_CONTENT_URL = "https://edge.api.brightcove.com/playback/v1/accounts/5481942443001/videos/"
 ADDON_PREFERRED_RESOLUTION = ADDON.getSetting('PreferedResolution')
 ADDON_PREFERRED_BITRATE = ADDON.getSetting('PreferedBitrate')
-BUILD_NUMBER  = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
 
 __handle__ = int(sys.argv[1])
 
@@ -38,10 +37,7 @@ def AddItemInMenu(items):
         if item['isDir'] == True:
             AddFolder(item)
         else:
-            if 'isForceDir' in item:
-                AddVideo(item, item['isForceDir'])
-            else:
-                AddVideo(item, False)
+            AddVideo(item)
 
     if items:
         if items[0]['sortable']:
@@ -91,7 +87,7 @@ def SetFanart(liz,fanart):
             liz.setProperty('fanart_image', ADDON_FANART)
 
 
-def AddVideo(show, forceFolder = False):
+def AddVideo(show):
     strTitle = show['title']
     strURL = show['url']
     strImage = show['image']
@@ -106,7 +102,8 @@ def AddVideo(show, forceFolder = False):
 
     bResult = True
     entry_url = sys.argv[0] + "?url=" + quote_plus(strURL) + "&sourceUrl=" + quote_plus(strSourceUrl)
-
+    print("===================================================")
+    print(strTitle)
     liz = xbmcgui.ListItem(remove_any_html_tags(strTitle))
     liz.setArt({ 'thumb' : strImage } )
     liz.setInfo(\
@@ -123,7 +120,7 @@ def AddVideo(show, forceFolder = False):
     SetFanart(liz, strFanart)
     liz.setProperty('IsPlayable', 'true')
 
-    bResult = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=forceFolder)
+    bResult = xbmcplugin.addDirectoryItem(handle=__handle__, url=entry_url, listitem=liz, isFolder=False)
     return bResult
 
 RE_HTML_TAGS = re.compile(r'<[^>]+>')
@@ -134,19 +131,16 @@ def PlayVideo(source_url):
     """ function docstring """
     log("navig.PlayVideo")
 
+    uri = None
+
+    strURL = THEPLATFORM_CONTENT_URL + source_url
     slugurl = BASE_URL_SLUG + source_url
-
-    videoId = ""
-
-    if 'ref:' in source_url:
-        videoId = source_url
-    else:
-        jsonDataEmission = simplejson.loads(html.get_url_txt(slugurl, True))
-        videoId = u'ref:' + jsonDataEmission['referenceId']
-
-    strURL = THEPLATFORM_CONTENT_URL + videoId
     log("Accessing: " + strURL)
-    jsonData = simplejson.loads(html.get_url_txt(strURL, True))
+
+    # Do not use cache or live tv will not work
+    jsonData = simplejson.loads(html.get_url_txt(slugurl, True))
+    
+
     log("Returned: ")
     log(jsonData)
 
@@ -256,10 +250,7 @@ def PlayVideo(source_url):
         if selectedStream.strProtocol != "":
             is_helper = inputstreamhelper.Helper(selectedStream.strProtocol, drm=selectedStream.strDrm)
             if is_helper.check_inputstream():
-                if BUILD_NUMBER >= 19:
-                    play_item.setProperty('inputstream', is_helper.inputstream_addon)
-                else:
-                    play_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
+                play_item.setProperty('inputstreamaddon', is_helper.inputstream_addon)
                 play_item.setProperty('inputstream.adaptive.manifest_type', selectedStream.strProtocol)
                 play_item.setProperty('inputstream.adaptive.license_type', selectedStream.strDrm)
                 play_item.setProperty('inputstream.adaptive.license_key', selectedStream.strLicUri + '||R{SSM}|')

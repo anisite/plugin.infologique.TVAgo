@@ -11,8 +11,6 @@ else:
     # Python 2 stuff
     from urllib import quote_plus, unquote_plus, unquote
 
-ADDON = xbmcaddon.Addon()
-
 def Load():
     log("default.Load")
     if filtres['content']['genreId'] != '':
@@ -35,7 +33,7 @@ def CreateFilteredList():
     if 'containerId' in filtres['content']:
         log(filtres['content']['containerId'])
         navig.AddItemInMenu(content.LoadContainerItems(filtres))
-        xbmc.executebuiltin('Container.SetViewMode(55)') # "List" view.
+        #xbmc.executebuiltin('Container.SetViewMode(50)') # "List" view.
     else:
         navig.AddItemInMenu(content.LoadContainers(filtres))
         xbmc.executebuiltin('Container.SetViewMode(500)') # "List" view.
