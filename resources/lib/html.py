@@ -5,7 +5,7 @@
 # version 0.2.6 - By CB
 
 import sys, re
-import socket, xbmc, xbmcaddon
+import socket, xbmc, xbmcaddon, simplejson
 import gzip
 
 if sys.version_info.major >= 3:
@@ -39,6 +39,19 @@ def handleHttpResponse(response):
         else:
             return response.read()
 
+def get_policykey(account, player, embed):
+    #
+    #5813221784001
+    #sd748Ih4e
+    #default
+    #
+    POLICY_CACHE_URL = "https://players.brightcove.net/" + account + "/" + player + "_" + embed + "/config.json"
+    
+    load = simplejson.loads(get_url_txt(POLICY_CACHE_URL, False))
+    log(load["video_cloud"]["policy_key"])
+
+    return load["video_cloud"]["policy_key"]
+
 def get_url_txt(the_url, enablePK=False):
     """ function docstring """
     log("html.get_url_txt")
@@ -49,7 +62,7 @@ def get_url_txt(the_url, enablePK=False):
                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'\
                    )
     if enablePK:
-        req.add_header('Accept', 'application/json;pk='+ xbmcaddon.Addon().getSetting('policyKey') )
+        req.add_header('Accept', 'application/json;pk=' + xbmcaddon.Addon().getSetting('policyKey'))
     else:
         req.add_header('Accept', 'application/json')
     req.add_header('Accept-Language', 'fr-CA,fr-FR;q=0.8,en-US;q=0.6,fr;q=0.4,en;q=0.2')
