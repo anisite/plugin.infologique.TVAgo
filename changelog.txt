@@ -1,3 +1,6 @@
+2.0.0 =======
+- Nouvelle API et support de kodi 19
+
 1.0.2 =======
 - Corriger le son absent sur certains appareils
 
