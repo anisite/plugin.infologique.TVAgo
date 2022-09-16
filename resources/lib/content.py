@@ -140,14 +140,14 @@ def LoadContainerItems(filtres):
                 strURL = BASE_URL_SLUG + season['slug']
                 log("Accessing: " + strURL)
                 
-                jsonDataSaison = json.loads(html.get_url_txt(BASE_URL_SLUG + season['slug']), encoding='utf-8')
+                jsonDataSaison = json.loads(html.get_url_txt(strURL), encoding='utf-8')
                 
                 for emission in jsonDataSaison['knownEntities']['relatedVideos']['associatedEntities'] :                    
-                    if emission['name'] == 'Épisodes':
+                    #if emission['name'] == 'Épisodes':
 
                         for episode in emission['associatedEntities'] :
                             newItem = { 'genreId': 1,
-                                        'title': 'Saison ' + str(season['seasonNumber']) + ' - ' + episode['label'],
+                                        'title': 'Saison ' + str(season['seasonNumber']) + ' - ' + emission['name'] + ' - ' + episode['label'],
                                         'sourceUrl' : episode['slug'],
                                         'filtres' : GetCopy(filtres)
                                         }
