@@ -137,11 +137,14 @@ def LoadContainerItems(filtres):
     try:
         if jsonData['discriminator'] == 'VideoShowEntity':
         # Get the item ids for the selected container
-            for season in jsonData['knownEntities']['seasons']['associatedEntities'] :
+            for season in jsonData['knownEntities']['seasons']['associatedEntities']:
+                strURL = BASE_URL_SLUG + season['slug']
+                log("Accessing: " + strURL)
+                
                 jsonDataSaison = json.loads(html.get_url_txt(BASE_URL_SLUG + season['slug']), encoding='utf-8')
-
-                for emission in jsonDataSaison['associatedEntities'] :
-                    #if emission['name'] == u'Épisodes':
+                
+                for emission in jsonDataSaison['knownEntities']['relatedVideos']['associatedEntities'] :                    
+                    if emission['name'] == 'Épisodes':
 
                         for episode in emission['associatedEntities'] :
                             newItem = { 'genreId': 1,
@@ -162,6 +165,7 @@ def LoadContainerItems(filtres):
                             newItem['rating'] = ''
 
                             listItems.append(newItem)
+                            
         elif jsonData['discriminator'] == 'VideoStreamEntity':
             newItem = { 'genreId': 1,
                         'title': jsonData['name'],
@@ -181,6 +185,7 @@ def LoadContainerItems(filtres):
             newItem['rating'] = ''
 
             listItems.append(newItem)
+
     except:
         log("content.LoadContainers: Error occured while processing")
 

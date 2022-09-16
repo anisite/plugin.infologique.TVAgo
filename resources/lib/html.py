@@ -59,17 +59,19 @@ def get_url_txt(the_url, enablePK=False):
     req = Request(the_url)
     req.add_header(\
                    'User-Agent', \
-                   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'\
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0'\
                    )
     if enablePK:
         req.add_header('Accept', 'application/json;pk=' + xbmcaddon.Addon().getSetting('policyKey'))
     else:
         req.add_header('Accept', 'application/json')
-    req.add_header('Accept-Language', 'fr-CA,fr-FR;q=0.8,en-US;q=0.6,fr;q=0.4,en;q=0.2')
+    req.add_header('Accept-Language', 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3')
     req.add_header('Accept-Encoding', 'gzip, deflate')
     req.add_header('Connection', 'keep-alive')
     req.add_header('Pragma', 'no-cache')
     req.add_header('Cache-Control', 'no-cache')
+    req.add_header('X-API-Key', 'f1c19163-0c32-4189-8b3a-10fb28512551/web-app-ssr')
+
     response = urlopen(req)
 
     data = handleHttpResponse(response)
