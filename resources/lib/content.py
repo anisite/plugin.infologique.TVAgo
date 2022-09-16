@@ -15,7 +15,7 @@ else:
     from urllib import quote_plus, unquote_plus, unquote
     from urllib2 import Request, urlopen
 
-BASE_URL_SLUG = 'https://www.qub.ca/proxy/pfu/content-delivery-service/v1/entities?slug='
+BASE_URL_SLUG = 'https://api.qub.ca/content-delivery-service/v1/entities?slug='
 #MEDIA_BUNDLE_URL = BASE_URL + 'MediaBundle/'
 
 SEASON = 'Saison'
