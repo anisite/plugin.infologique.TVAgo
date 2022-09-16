@@ -128,7 +128,7 @@ def AddVideo(show, forceFolder = False):
 
 RE_HTML_TAGS = re.compile(r'<[^>]+>')
 RE_AFTER_CR = re.compile(r'\n.*')
-BASE_URL_SLUG = 'https://www.qub.ca/proxy/pfu/content-delivery-service/v1/entities?slug='
+BASE_URL_SLUG = 'https://api.qub.ca/content-delivery-service/v1/entities?slug='
 
 def PlayVideo(source_url):
     """ function docstring """

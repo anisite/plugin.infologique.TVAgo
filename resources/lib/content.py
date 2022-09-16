@@ -16,7 +16,6 @@ else:
     from urllib2 import Request, urlopen
 
 BASE_URL_SLUG = 'https://api.qub.ca/content-delivery-service/v1/entities?slug='
-#MEDIA_BUNDLE_URL = BASE_URL + 'MediaBundle/'
 
 SEASON = 'Saison'
 EPISODE = 'Episode'

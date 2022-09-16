@@ -54,7 +54,7 @@ def get_policykey(account, player, embed):
 
 def get_url_txt(the_url, enablePK=False):
     """ function docstring """
-    log("html.get_url_txt")
+    log("html.get_url_txt: " + the_url)
 
     req = Request(the_url)
     req.add_header(\
