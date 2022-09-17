@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.infologique.TVAgo" name="TVA" version="1.0.5" provider-name="anisite, MaximeLussier">
+<addon id="plugin.infologique.TVAgo" name="TVA+" version="2.0.0" provider-name="anisite, MaximeLussier">
   <requires>
-    <import addon="xbmc.python" version="2.25.0"/>
-    <import addon="script.module.simplejson" version="2.0.10"/>
-    <import addon="script.module.inputstreamhelper" version="0.3.4"/>
+    <import addon="script.module.simplejson" version="3.16.1"/>
+    <import addon="script.module.inputstreamhelper" version="0.5.2"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>
@@ -15,7 +14,10 @@
 -Rattrapez les émissions des quelques derniers jours
 -Découvrez certaines émissions des chaînes spécialisées du Groupe TVA : AddikTV, Casa, Moi&amp;cie, Prise 2 et Yoopa
 -Explorez des primeurs, des exclusivités, des vidéos inédites et différentes thématiques</description>
-    <news>v1.0.5 (2020-03-02) - Correction pour inputstream.</news>
+    <assets>
+        <icon>resources/icon.png</icon>
+        <fanart>resources/fanart.jpg</fanart>
+    </assets>
     <language>fr</language>
     <source>https://github.com/anisite/plugin.infologique.TVAgo</source>
   </extension>
