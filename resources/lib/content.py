@@ -83,41 +83,40 @@ def LoadContainers(filtres):
                     for emission in jsonContainer['associatedEntities'] :
                         insert = True
 
-                        if emission['discriminator'] == 'ExternalLinkPresentationEntity' or emission['discriminator'] == 'VideoPresentationEntity' or \
-                             emission['discriminator'] == 'PosterPresentationEntity':
-                            continue # ignore those kind of discriminator
+                        # inclue seulement les émissions
+                        if emission['discriminator'] == 'VideoShowPresentationEntity' or emission['discriminator'] == 'VideoShowEntity':
 
-                        for op in listContainers:
-                            if op['containerId'] == emission['slug']:
-                                insert = False
-                                break
+                            for op in listContainers:
+                                if "slug" not in emission or ("slug" in emission and op['containerId'] == emission['slug']):
+                                    insert = False
+                                    break
 
-                        if insert:
-                            newContainer = {'genreId': 1,
-                                            'title': emission['label'],
-                                            'filtres' : GetCopy(filtres)
-                                        }
-                            image = ""
-                            if 'mainImage' in emission:
-                                if 'crops' in emission['mainImage']:
-                                    image = emission['mainImage']['crops'][1]['url']
-                                else:
-                                    image = emission['mainImage']['url']
+                            if insert:
+                                newContainer = {'genreId': 1,
+                                                'title': emission['label'],
+                                                'filtres' : GetCopy(filtres)
+                                            }
+                                image = ""
+                                if 'mainImage' in emission:
+                                    if 'crops' in emission['mainImage'] and '1' in emission['mainImage']['crops'] and 'url' in emission['mainImage']['crops'][1]:
+                                        image = emission['mainImage']['crops'][1]['url']
+                                    else:
+                                        image = emission['mainImage']['url']
 
-                            newContainer['image'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
-                            newContainer['fanart'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
+                                newContainer['image'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
+                                newContainer['fanart'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
 
-                            newContainer['url'] = newContainer['filtres']['content']['url']
-                            newContainer['containerId'] = emission['slug']
-                            newContainer['plot'] = "."
+                                newContainer['url'] = newContainer['filtres']['content']['url']
+                                newContainer['containerId'] = emission['slug']
+                                newContainer['plot'] = "."
 
-                            newContainer['filtres']['content']['containerId'] =  newContainer['containerId']
-                            newContainer['filtres']['content']['genreId'] = newContainer['genreId']
+                                newContainer['filtres']['content']['containerId'] =  newContainer['containerId']
+                                newContainer['filtres']['content']['genreId'] = newContainer['genreId']
 
-                            newContainer['isDir'] = True
-                            newContainer['sortable'] = True
+                                newContainer['isDir'] = True
+                                newContainer['sortable'] = True
 
-                            listContainers.append(newContainer)
+                                listContainers.append(newContainer)
 
     log("content.LoadContainersExit")
     return listContainers
@@ -134,27 +133,80 @@ def LoadContainerItems(filtres):
 
     listItems = []
     try:
+    
         if jsonData['discriminator'] == 'VideoShowEntity':
-        # Get the item ids for the selected container
-            for season in jsonData['knownEntities']['seasons']['associatedEntities']:
-                strURL = BASE_URL_SLUG + season['slug']
-                log("Accessing: " + strURL)
-                
-                jsonDataSaison = json.loads(html.get_url_txt(strURL), encoding='utf-8')
-                
-                for emission in jsonDataSaison['knownEntities']['relatedVideos']['associatedEntities'] :                    
+
+            # emission avec des saisons
+            if 'seasons' in jsonData['knownEntities']:
+                for season in jsonData['knownEntities']['seasons']['associatedEntities']:
+                    strURL = BASE_URL_SLUG + season['slug']
+                    log("Accessing: " + strURL)
+
+                    jsonDataSaison = json.loads(html.get_url_txt(strURL), encoding='utf-8')
+
+                    for emission in jsonDataSaison['knownEntities']['relatedVideos']['associatedEntities'] :
+                        #if emission['name'] == 'Épisodes':
+
+                            for episode in emission['associatedEntities'] :
+                                newItem = { 'genreId': 1,
+                                            'title': 'Saison ' + str(season['seasonNumber']) + ' - ' + emission['name'] + ' - ' + episode['label'],
+                                            'sourceUrl' : episode['slug'],
+                                            'filtres' : GetCopy(filtres)
+                                            }
+                                newItem['isDir'] = False
+                                newItem['sortable'] = False
+                                newItem['url'] = episode['slug']
+                                newItem['filtres']['content']['containerId'] = season['slug']
+                                newItem['image'] = episode['mainImage']['url']
+                                newItem['fanart'] = episode['mainImage']['url']
+                                newItem['plot'] = episode.get('description')
+                                newItem['duration'] = episode['durationMillis'] / 1000
+                                newItem['startDate'] = episode['activationDate']
+                                newItem['genre'] = ''
+                                newItem['rating'] = ''
+
+                                listItems.append(newItem)
+
+            # emission principal sans saison
+            if 'mainVideo' in jsonData['knownEntities']:
+                episode = jsonData['knownEntities']['mainVideo']
+
+                #for episode in emission['associatedEntities'] :
+                newItem = { 'genreId': 1,
+                            'title':  episode['label'],
+                            'sourceUrl' : episode['slug'],
+                            'filtres' : GetCopy(filtres)
+                            }
+                newItem['isDir'] = False
+                newItem['sortable'] = False
+                newItem['url'] = episode['slug']
+                newItem['filtres']['content']['containerId'] = episode['slug']
+                newItem['image'] = episode['mainImage']['url']
+                newItem['fanart'] = episode['mainImage']['url']
+                newItem['plot'] = episode.get('description')
+                newItem['duration'] = episode['durationMillis'] / 1000
+                newItem['startDate'] = episode['activationDate']
+                newItem['genre'] = ''
+                newItem['rating'] = ''
+
+                listItems.append(newItem)
+ 
+            # emission sans saison. Contenu additionel.
+            if 'relatedVideos' in jsonData['knownEntities']:
+
+                for emission in jsonData['knownEntities']['relatedVideos']['associatedEntities'] :
                     #if emission['name'] == 'Épisodes':
 
                         for episode in emission['associatedEntities'] :
                             newItem = { 'genreId': 1,
-                                        'title': 'Saison ' + str(season['seasonNumber']) + ' - ' + emission['name'] + ' - ' + episode['label'],
+                                        'title': emission['name'] + ' - ' + episode['label'],
                                         'sourceUrl' : episode['slug'],
                                         'filtres' : GetCopy(filtres)
                                         }
                             newItem['isDir'] = False
                             newItem['sortable'] = False
                             newItem['url'] = episode['slug']
-                            newItem['filtres']['content']['containerId'] = season['slug']
+                            newItem['filtres']['content']['containerId'] = emission['slug']
                             newItem['image'] = episode['mainImage']['url']
                             newItem['fanart'] = episode['mainImage']['url']
                             newItem['plot'] = episode.get('description')
@@ -164,7 +216,7 @@ def LoadContainerItems(filtres):
                             newItem['rating'] = ''
 
                             listItems.append(newItem)
-                            
+
         elif jsonData['discriminator'] == 'VideoStreamEntity':
             newItem = { 'genreId': 1,
                         'title': jsonData['name'],
