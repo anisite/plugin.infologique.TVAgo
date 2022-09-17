@@ -1,6 +1,6 @@
 # plugin.infologique.TVAgo
 
-Addon Kodi pour les vidéos disponibles sur le site de TVA "https://videos.tva.ca/"
+Addon Kodi pour les vidéos disponibles sur le site de TVA "https://www.qub.ca/tvaplus"
 
 Tout le contenu vidéo reste propriété de TVA et est disponible légalement et gratuitement.
 

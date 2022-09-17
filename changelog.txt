@@ -1,3 +1,6 @@
+2.0.1 =======
+- Corrige nouvelle URL utilisé par TVA+
+
 2.0.0 =======
 - Nouvelle API et support de kodi 19
 

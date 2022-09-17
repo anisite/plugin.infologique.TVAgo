@@ -15,8 +15,7 @@ else:
     from urllib import quote_plus, unquote_plus, unquote
     from urllib2 import Request, urlopen
 
-BASE_URL_SLUG = 'https://www.qub.ca/proxy/pfu/content-delivery-service/v1/entities?slug='
-#MEDIA_BUNDLE_URL = BASE_URL + 'MediaBundle/'
+BASE_URL_SLUG = 'https://api.qub.ca/content-delivery-service/v1/entities?slug='
 
 SEASON = 'Saison'
 EPISODE = 'Episode'
@@ -137,15 +136,18 @@ def LoadContainerItems(filtres):
     try:
         if jsonData['discriminator'] == 'VideoShowEntity':
         # Get the item ids for the selected container
-            for season in jsonData['knownEntities']['seasons']['associatedEntities'] :
-                jsonDataSaison = json.loads(html.get_url_txt(BASE_URL_SLUG + season['slug']), encoding='utf-8')
-
-                for emission in jsonDataSaison['associatedEntities'] :
-                    #if emission['name'] == u'Épisodes':
+            for season in jsonData['knownEntities']['seasons']['associatedEntities']:
+                strURL = BASE_URL_SLUG + season['slug']
+                log("Accessing: " + strURL)
+                
+                jsonDataSaison = json.loads(html.get_url_txt(strURL), encoding='utf-8')
+                
+                for emission in jsonDataSaison['knownEntities']['relatedVideos']['associatedEntities'] :                    
+                    #if emission['name'] == 'Épisodes':
 
                         for episode in emission['associatedEntities'] :
                             newItem = { 'genreId': 1,
-                                        'title': 'Saison ' + str(season['seasonNumber']) + ' - ' + episode['label'],
+                                        'title': 'Saison ' + str(season['seasonNumber']) + ' - ' + emission['name'] + ' - ' + episode['label'],
                                         'sourceUrl' : episode['slug'],
                                         'filtres' : GetCopy(filtres)
                                         }
@@ -162,6 +164,7 @@ def LoadContainerItems(filtres):
                             newItem['rating'] = ''
 
                             listItems.append(newItem)
+                            
         elif jsonData['discriminator'] == 'VideoStreamEntity':
             newItem = { 'genreId': 1,
                         'title': jsonData['name'],
@@ -181,6 +184,7 @@ def LoadContainerItems(filtres):
             newItem['rating'] = ''
 
             listItems.append(newItem)
+
     except:
         log("content.LoadContainers: Error occured while processing")
 
