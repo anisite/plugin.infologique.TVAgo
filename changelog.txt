@@ -1,3 +1,8 @@
+2.0.2 =======
+- Corrige Zeste,TVA sport et Evasion qui ne marchait plus.
+- Enleve les items qui ne sont pas des emissions (comme des nouvelles de sport).
+- Corrige les emissions qui etaient vide parce qu'ils n'ont pas de saison. Comme les emissions d'humour.
+
 2.0.1 =======
 - Corrige nouvelle URL utilisé par TVA+
 
