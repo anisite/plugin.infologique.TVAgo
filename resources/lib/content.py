@@ -217,9 +217,10 @@ def LoadContainerItems(filtres):
 
                             listItems.append(newItem)
 
+        # en-direct
         elif jsonData['discriminator'] == 'VideoStreamEntity':
             newItem = { 'genreId': 1,
-                        'title': jsonData['name'],
+                        'title': jsonData['sourceReference']['name'],
                         'sourceUrl' : u'ref:' + jsonData['referenceId'],
                         'filtres' : GetCopy(filtres)
                         }
@@ -238,7 +239,7 @@ def LoadContainerItems(filtres):
             listItems.append(newItem)
 
     except:
-        log("content.LoadContainers: Error occured while processing")
+        log("content.LoadContainerItemsExit: Error occured while processing")
 
     log("content.LoadContainerItemsExit")
     return listItems
