@@ -17,4 +17,3 @@ if sys.argv[1].lower() == "full":
         for file in files:
             xbmcvfs.delete(os.path.join(root,file))
     xbmcgui.Dialog().ok(addon.getAddonInfo('name'), addon.getLocalizedString(32108),addon.getLocalizedString(32109))
-
