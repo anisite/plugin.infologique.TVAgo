@@ -216,28 +216,6 @@ def LoadContainerItems(filtres):
                             newItem['rating'] = ''
 
                             listItems.append(newItem)
-
-        # en-direct
-        elif jsonData['discriminator'] == 'VideoStreamEntity':
-            newItem = { 'genreId': 1,
-                        'title': jsonData['sourceReference']['name'],
-                        'sourceUrl' : u'ref:' + jsonData['referenceId'],
-                        'filtres' : GetCopy(filtres)
-                        }
-            newItem['isDir'] = False
-            newItem['sortable'] = False
-            newItem['url'] = newItem['sourceUrl']
-            newItem['filtres']['content']['containerId'] = newItem['sourceUrl']
-            newItem['image'] = jsonData['image']['url']
-            newItem['fanart'] = jsonData['image']['url']
-            newItem['plot'] = ''
-            newItem['duration'] = ''
-            newItem['startDate'] = ''
-            newItem['genre'] = ''
-            newItem['rating'] = ''
-
-            listItems.append(newItem)
-
     except:
         log("content.LoadContainerItemsExit: Error occured while processing")
 
@@ -265,6 +243,8 @@ def LoadMainMenu(filtres):
     jsonMenuItems = jsonConfig['associatedEntities']
 
     liste = []
+
+    liste = LoadDirect(filtres)
 
     for carte in jsonMenuItems :
         #log(u(carte['title']) + ":")
@@ -294,6 +274,56 @@ def LoadMainMenu(filtres):
 
     log("content.LoadMainMenuExit")
     return liste
+
+def LoadDirect(filtres):
+    log("content.LoadDirect")
+
+    try:
+        strURL = BASE_URL_SLUG + "/accueil/qubtv-en-direct"
+        log("Accessing: " + strURL)
+        jsonPostesConfig = json.loads(html.get_url_txt(strURL, False), encoding='utf-8')
+        log("Returned:")
+        log(jsonPostesConfig)
+
+        jsonListPostes = jsonPostesConfig['associatedEntities']
+
+        liste = []
+
+        for postesLvl1 in jsonListPostes :
+            for posteLvl2 in postesLvl1['associatedEntities'] :
+
+                strURL = BASE_URL_SLUG + posteLvl2['slug']
+                log("Accessing: " + strURL)
+                jsonPosteDetail = json.loads(html.get_url_txt(strURL, False), encoding='utf-8')
+                log("Returned:")
+                log(jsonPosteDetail)
+
+                if jsonPosteDetail['discriminator'] == 'VideoStreamEntity':
+                    newItem = { 'genreId': 1,
+                                'title': "En Direct " + jsonPosteDetail['sourceReference']['name'],
+                                'sourceUrl' : u'ref:' + jsonPosteDetail['referenceId'],
+                                'url' : u'ref:' + jsonPosteDetail['referenceId'],
+                                'filtres' : GetCopy(filtres),
+                                'isDir' : False,
+                                'sortable' : False,
+                                'image' : jsonPosteDetail['image']['url'],
+                                'fanart' : jsonPosteDetail['image']['url'],
+                                'plot' : '',
+                                'duration' : '',
+                                'startDate' : '',
+                                'genre' : '',
+                                'rating' : ''
+                                }
+                    newItem['filtres']['content']['containerId'] = newItem['sourceUrl']
+                    
+                    liste.append(newItem)
+    except:
+        log("content.LoadDirect: Error occured while processing")
+
+
+    log("content.LoadDirectExit")
+    return liste
+
 
 def log(msg):
     """ function docstring """
