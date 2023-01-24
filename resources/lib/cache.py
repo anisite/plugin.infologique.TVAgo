@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import xbmcaddon, os, xbmc, time, sys, xbmcvfs
+import xbmcaddon, os, time, sys
 from . import html
 
 ADDON = xbmcaddon.Addon()
-
-ADDON_CACHE_BASEDIR = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('path')), ".cache")
-ADDON_CACHE_TTL = float(ADDON.getSetting('CacheTTL').replace("0", ".5").replace("73", "0"))
 
 if not os.path.exists(ADDON_CACHE_BASEDIR):
     os.makedirs(ADDON_CACHE_BASEDIR)
 
 if sys.version >= "2.5":
     from hashlib import md5 as _hash
+    import xbmcvfs
+    ADDON_CACHE_BASEDIR = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('path')), ".cache")
 else:
     from md5 import new as _hash
+    import xmbc
+    ADDON_CACHE_BASEDIR = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('path')), ".cache")
 
+ADDON_CACHE_TTL = float(ADDON.getSetting('CacheTTL').replace("0", ".5").replace("73", "0"))
 
 def is_cached_content_expired(last_update):
     """ function docstring """
