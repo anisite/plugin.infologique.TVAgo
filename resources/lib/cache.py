@@ -5,18 +5,23 @@ from . import html
 
 ADDON = xbmcaddon.Addon()
 
-if not os.path.exists(ADDON_CACHE_BASEDIR):
-    os.makedirs(ADDON_CACHE_BASEDIR)
-
-if sys.version >= "2.5":
-    from hashlib import md5 as _hash
+if sys.version_info.major >= 3:
+    # Python 3 stuff
     import xbmcvfs
     ADDON_CACHE_BASEDIR = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('path')), ".cache")
 else:
-    from md5 import new as _hash
-    import xmbc
-    ADDON_CACHE_BASEDIR = os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('path')), ".cache")
+    # Python 2 (kodi 18 et moins)
+    import xbmc
+    ADDON_CACHE_BASEDIR = os.path.join(xbmc.translatePath(ADDON.getAddonInfo('path')), ".cache")
 
+if sys.version >= "2.5":
+    from hashlib import md5 as _hash
+else:
+    from md5 import new as _hash
+
+if not os.path.exists(ADDON_CACHE_BASEDIR):
+    os.makedirs(ADDON_CACHE_BASEDIR)
+    
 ADDON_CACHE_TTL = float(ADDON.getSetting('CacheTTL').replace("0", ".5").replace("73", "0"))
 
 def is_cached_content_expired(last_update):
