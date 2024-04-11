@@ -261,7 +261,7 @@ def LoadMainMenu(filtres):
                             'filtres' : GetCopy(filtres)
                         }
 
-            newItem['filtres']['content']['url'] = carte['slug']
+            newItem['filtres']['content']['url'] = carte['slug'].replace('/tva', '/accueil/qubtv-emissions')
             newItem['isDir'] = True
             newItem['sortable'] = False
             newItem['fanart'] = xbmcaddon.Addon().getAddonInfo('path') + '/resources/fanart.jpg'
