@@ -1,8 +1,26 @@
 # -*- coding: utf-8 -*-
 
-import os, sys, traceback, xbmcplugin, xbmcaddon, xbmc, simplejson, xbmcgui
+try:
+    import xbmc
+    import xbmcaddon
+    import xbmcplugin
+    import xbmcgui
+except ImportError:
+    # Pour le développement en dehors de Kodi
+    from mock_modules import xbmc
+    from mock_modules import xbmcaddon
+
+import os, sys, traceback, simplejson
 
 from resources.lib import content, navig
+
+try:
+    # Pour Kodi 19 et versions ultérieures
+    from xbmcvfs import translatePath
+except ImportError:
+    # Pour les versions antérieures à Kodi 19
+    translatePath = xbmc.translatePath
+
 
 if sys.version_info.major >= 3:
     # Python 3 stuff
@@ -128,7 +146,7 @@ if MODE != 99:
     xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 if MODE != 4 and xbmcaddon.Addon().getSetting('DeleteTempFiFilesEnabled') == 'true':
-    PATH = xbmc.translatePath('special://temp').decode('utf-8')
+    PATH = translatePath('special://temp').decode('utf-8')
     FILENAMES = next(os.walk(PATH))[2]
     for i in FILENAMES:
         if ".fi" in i:

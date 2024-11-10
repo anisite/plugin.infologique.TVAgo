@@ -1,11 +1,26 @@
 # -*- coding: utf-8 -*-
 
-import xbmcaddon, os, xbmc, time, sys
-from . import html
+try:
+    import xbmc
+    import xbmcaddon
+except ImportError:
+    # Pour le développement en dehors de Kodi
+    from mock_modules import xbmc
+    from mock_modules import xbmcaddon
+
+from . import  html
+import os, time, sys
+
+try:
+    # Pour Kodi 19 et versions ultérieures
+    from xbmcvfs import translatePath
+except ImportError:
+    # Pour les versions antérieures à Kodi 19
+    translatePath = xbmc.translatePath
 
 ADDON = xbmcaddon.Addon()
 
-ADDON_CACHE_BASEDIR = os.path.join(xbmc.translatePath(ADDON.getAddonInfo('path')), ".cache")
+ADDON_CACHE_BASEDIR = os.path.join(translatePath(ADDON.getAddonInfo('path')), ".cache")
 ADDON_CACHE_TTL = float(ADDON.getSetting('CacheTTL').replace("0", ".5").replace("73", "0"))
 
 if not os.path.exists(ADDON_CACHE_BASEDIR):

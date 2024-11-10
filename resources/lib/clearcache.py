@@ -8,8 +8,16 @@ import xbmcgui
 import xbmcvfs
 from xbmcaddon import Addon
 
+try:
+    # Pour Kodi 19 et versions ultérieures
+    from xbmcvfs import translatePath
+except ImportError:
+    # Pour les versions antérieures à Kodi 19
+    translatePath = xbmc.translatePath
+
+
 addon = Addon('plugin.infologique.TVAgo')
-addon_cache_basedir = os.path.join(xbmc.translatePath(addon.getAddonInfo('path')).decode('utf-8'),".cache")
+addon_cache_basedir = os.path.join(translatePath(addon.getAddonInfo('path')).decode('utf-8'),".cache")
 
 if sys.argv[1].lower() == "full":
     print "["+addon.getAddonInfo('name')+"] deleting full cache"

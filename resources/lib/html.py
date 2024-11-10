@@ -4,8 +4,16 @@
 # version 2.0.2 - By SlySen
 # version 0.2.6 - By CB
 
+try:
+    import xbmc
+    import xbmcaddon
+except ImportError:
+    # Pour le développement en dehors de Kodi
+    from mock_modules import xbmc
+    from mock_modules import xbmcaddon
+
 import sys, re
-import socket, xbmc, xbmcaddon, simplejson
+import socket, simplejson
 import gzip
 
 if sys.version_info.major >= 3:
@@ -70,7 +78,9 @@ def get_url_txt(the_url, enablePK=False):
     req.add_header('Connection', 'keep-alive')
     req.add_header('Pragma', 'no-cache')
     req.add_header('Cache-Control', 'no-cache')
-    req.add_header('X-API-Key', 'f1c19163-0c32-4189-8b3a-10fb28512551/web-app-ssr')
+    req.add_header('x-api-key', '20c9f62e-f16f-44c1-97f2-362cb561b9d9/qub-web-tvaplus')
+    req.add_header('x-pfu-platform', 'WEB')
+    req.add_header('x-pfu-tenant', 'TVAPLUS')
 
     response = urlopen(req)
 

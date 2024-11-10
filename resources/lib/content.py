@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 # encoding=utf8
 
-import sys, re, xbmcaddon, xbmc, datetime, time, copy
+try:
+    import xbmc
+    import xbmcaddon
+except ImportError:
+    # Pour le développement en dehors de Kodi
+    from mock_modules import xbmc
+    from mock_modules import xbmcaddon
+
 from . import cache, html
+import sys, re, datetime, time, copy
 import simplejson as json
 
 if sys.version_info.major >= 3:
@@ -16,6 +24,7 @@ else:
     from urllib2 import Request, urlopen
 
 BASE_URL_SLUG = 'https://api.qub.ca/content-delivery-service/v1/entities?slug='
+BASE_URL = 'https://api.qub.ca/content-delivery-service/v1/entities'
 
 SEASON = 'Saison'
 EPISODE = 'Episode'
@@ -33,49 +42,62 @@ def LoadContainers(filtres):
     log("content.LoadContainers")
     log(filtres)
 
-    strURL = BASE_URL_SLUG + filtres['content']['url']
+    if 'containerId' in filtres['content']:
+        strURL = BASE_URL_SLUG + filtres['content']['containerId']
+    else:
+        strURL = BASE_URL_SLUG + filtres['content']['url']
+        
     log("Accessing: " + strURL)
     jsonData = json.loads(html.get_url_txt(strURL), encoding='utf-8')
     log("Returned:")
-    log(jsonData)
+    #log(jsonData)
 
     jsonContainers = jsonData['associatedEntities']
 
     listContainers = []
-    if 'knownEntities' in jsonData and 'videoStream' in jsonData['knownEntities']:
-        enDirect = jsonData['knownEntities']['videoStream']
-        newContainer = {'genreId': 1,
-                        'title': '-- En direct --',
-                        'filtres' : GetCopy(filtres)
-                        }
-        #image = ""
-        #if 'mainImage' in emission:
-        image = enDirect['image']['url']
+    if 'knownEntities' in jsonData: # and 'videoStream' in jsonData['knownEntities']:
+        for entite in jsonData['knownEntities']:
+               
+            if 'videoStream' in entite or 'channel' in entite:
+                enDirect = jsonData['knownEntities'][entite]
+                newContainer = {'genreId': 1,
+                                'title': '-- En direct --',
+                                'filtres' : GetCopy(filtres)
+                                }
+                #image = ""
+                #if 'mainImage' in emission:
+                try:
+                    image = enDirect['image']['crops'][1]['url']
+                except:
+                    try:
+                        image = enDirect['image']['url']
+                    except: 
+                        image = enDirect['logo']['url']
 
-        newContainer['image'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
-        newContainer['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
+                newContainer['image'] = image #xbmcaddon.Addon().getAddonInfo('path')+'/icon.png'
+                newContainer['fanart'] = xbmcaddon.Addon().getAddonInfo('path')+'/fanart.jpg'
 
-        newContainer['url'] = u'ref:' + enDirect['slug']
-        newContainer['containerId'] = enDirect['slug']
-        newContainer['plot'] = "."
+                newContainer['url'] = u'ref:' + enDirect['slug']
+                newContainer['containerId'] = enDirect['slug']
+                newContainer['plot'] = "."
 
-        newContainer['filtres']['content']['containerId'] =  newContainer['containerId']
-        newContainer['filtres']['content']['genreId'] = newContainer['genreId']
+                newContainer['filtres']['content']['containerId'] =  newContainer['containerId']
+                newContainer['filtres']['content']['genreId'] = newContainer['genreId']
 
-        newContainer['isDir'] = True
-        newContainer['isForceDir'] = False
-        newContainer['duration'] = 0
-        #newContainer['sourceUrl'] = newContainer['url']
-        newContainer['startDate'] = ''
-        newContainer['genre'] = ''
-        newContainer['rating'] = 'Everyone'
-        newContainer['sortable'] = True 
+                newContainer['isDir'] = True
+                newContainer['isForceDir'] = False
+                newContainer['duration'] = 0
+                #newContainer['sourceUrl'] = newContainer['url']
+                newContainer['startDate'] = ''
+                newContainer['genre'] = ''
+                newContainer['rating'] = 'Everyone'
+                newContainer['sortable'] = True 
 
-        listContainers.append(newContainer)
+                listContainers.append(newContainer)
 
     for jsonContainer in jsonContainers :
         if 'name' in jsonContainer:
-            if 'tout-voir' in jsonContainer['slug']:
+            if True: #'tout-voir' in jsonContainer['slug']:
 
             ## Show the container
             #else:
@@ -100,7 +122,10 @@ def LoadContainers(filtres):
                             image = ""
                             if 'mainImage' in emission:
                                 if 'crops' in emission['mainImage']:
-                                    image = emission['mainImage']['crops'][1]['url']
+                                    try:
+                                        image = emission['mainImage']['crops'][0]['url']
+                                    except:
+                                        None
                                 else:
                                     image = emission['mainImage']['url']
 
@@ -246,3 +271,12 @@ def log(msg):
     """ function docstring """
     #if xbmcaddon.Addon().getSetting('DebugMode') == 'true':
     xbmc.log('[%s - DEBUG]: %s' % (xbmcaddon.Addon().getAddonInfo('name'), msg))
+
+
+
+try:
+    mmock = xbmc.MODEMOCK
+    val = {"content": {"genreId": 1, "mediaBundleId": -1, "afficherTous": False, "url": "/qub", 'containerId': '/qub/isabelle-marechal'}, "show": {"Saison": "", "Episode": "", "label": ""}, "fullNameItems": [], "sourceId": ""}
+    LoadContainers(val)
+except:
+    None

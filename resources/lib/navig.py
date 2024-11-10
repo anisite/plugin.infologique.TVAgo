@@ -1,6 +1,17 @@
 ﻿# -*- coding: utf-8 -*-
 
-import sys, xbmcgui, xbmcplugin, xbmcaddon, re, simplejson, xbmc, inputstreamhelper
+try:
+    import xbmc
+    import xbmcaddon
+    import xbmcgui
+    import xbmcplugin
+    import inputstreamhelper
+except ImportError:
+    # Pour le développement en dehors de Kodi
+    from mock_modules import xbmc
+    from mock_modules import xbmcaddon
+
+import sys, re, simplejson
 
 from . import cache, html
 
